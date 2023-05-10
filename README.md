@@ -1,4 +1,4 @@
 # Gambit
-![Build](https://github.com/bungogood/gambit/actions/workflows/build.yml/badge.svg)
+[![Build](../../workflows/build.yml/badge.svg)](../../workflows/build.yml)
 
 Gambit is a robotic chessboard
