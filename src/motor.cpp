@@ -1,11 +1,13 @@
 #include <Arduino.h>
 #include "motor.hpp"
 
-Motor::Motor(int dirPin, int stepPin, int stepsPerRevolution)
-    : dirPin(dirPin), stepPin(stepPin), stepsPerRevolution(stepsPerRevolution)
+Motor::Motor(int enablePin, int dirPin, int stepPin, int stepsPerRevolution)
+    : enablePin(enablePin), dirPin(dirPin), stepPin(stepPin), stepsPerRevolution(stepsPerRevolution)
 {
+    pinMode(enablePin, OUTPUT);
     pinMode(dirPin, OUTPUT);
     pinMode(stepPin, OUTPUT);
+    disable();
     setDirection(CW);
 }
 
@@ -37,6 +39,7 @@ void Motor::step(int interval) {
  * @param interval
  */
 void Motor::steps(int steps, int interval) {
+    enable();
     for(int i = 0; i < steps; i++) {
         step(interval);
     }
@@ -50,13 +53,4 @@ void Motor::steps(int steps, int interval) {
 void Motor::setDirection(bool dir) {
     digitalWrite(dirPin, dir);
     direction = dir;
-}
-
-/**
- * @brief Get the current position of the motor
- * 
- * @return int position in steps
- */
-int Motor::getPosition() {
-    return position;
 }

@@ -2,7 +2,7 @@
 
 #include "motor.hpp"
 
-#define STEPS_PER_MM 80
+#define STEPS_PER_MM 1
 #define DEFAULT_SPEED 1000
 #define CALIBRATION_SPEED 1000
 

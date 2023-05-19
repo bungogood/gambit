@@ -13,10 +13,13 @@ HBot::HBot(Motor leftMotor, Motor rightMotor, int switchPin)
  * @param speed movement speed
  */
 void HBot::calibrate(int speed) {
-    leftMotor.setDirection(CW);
+    leftMotor.disable();
+    rightMotor.enable();
+    rightMotor.setDirection(CW);
     while (digitalRead(switchPin) == LOW) {
-        leftMotor.step(speed);
+        rightMotor.step(speed);
     }
+    leftMotor.enable();
     leftMotor.reset();
     rightMotor.reset();
 }
@@ -35,7 +38,33 @@ void HBot::gotoPosition(Position position, int speed) {
     move({ diagonal.x - leftMotor.getPosition(), diagonal.y - rightMotor.getPosition() }, speed);
 }
 
+/*
+void HBot::move(Vector Vector, int speed) {
+    leftMotor.setDirection(Vector.x > 0);
+    rightMotor.setDirection(Vector.y > 0);
+
+
+    // int leftSteps  = vector.x;
+    // int rightSteps = vector.x;
+    leftMotor.enable();
+    rightMotor.enable();
+    for (int i = 0; i < abs(Vector.x); i++) {
+        leftMotor.step(speed);
+    }
+    for (int i = 0; i < abs(Vector.y); i++) {
+        rightMotor.step(speed);
+    }
+    leftMotor.disable();
+    rightMotor.disable();
+}
+*/
+
+
 void HBot::move(Vector vector, int speed) {
+    // enable motors
+    leftMotor.enable();
+    rightMotor.enable();
+
     // set direction of motors
     leftMotor.setDirection(vector.x > 0);
     rightMotor.setDirection(vector.y > 0);
@@ -56,16 +85,17 @@ void HBot::move(Vector vector, int speed) {
     float current = 0;
 
     while (largerSteps > 0) {
+        current++;
         larger->stepInit();
         if (current >= ratio) smaller->stepInit();
         delayMicroseconds(speed);
         larger->stepEnd();
-        largerSteps--;
         if (current >= ratio) {
             smaller->stepEnd();
             current -= ratio;
             smallerSteps--;
         }
+        largerSteps--;
         delayMicroseconds(speed);
     }
 
@@ -73,6 +103,10 @@ void HBot::move(Vector vector, int speed) {
         smaller->step(speed);
         smallerSteps--;
     }
+
+    // enable motors
+    leftMotor.disable();
+    rightMotor.disable();
 }
 
 /**
