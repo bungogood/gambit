@@ -3,8 +3,8 @@
 #include "motor.hpp"
 
 #define STEPS_PER_MM 5.6
-#define DEFAULT_SPEED 1000
-#define CALIBRATION_SPEED 1000
+#define DEFAULT_SPEED 500
+#define CALIBRATION_SPEED 500
 
 #define X_LIMIT 400
 #define Y_LIMIT 500
@@ -23,11 +23,11 @@ class HBot {
     Motor* rightMotor;
 
     int switchPin;
+public:
+    HBot(Motor* leftMotor, Motor* rightMotor, int switchPin);
 
     Vector toDiagonal(Position position);
     void move(Vector vector, int speed);
-public:
-    HBot(Motor* leftMotor, Motor* rightMotor, int switchPin);
 
     void calibrate(int speed = CALIBRATION_SPEED);
     void gotoPosition(Position position, int speed = DEFAULT_SPEED);

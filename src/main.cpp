@@ -12,7 +12,9 @@ void setup() {
     Serial.println("Starting...");
     hbot.calibrate();
     Serial.println("Calibrated");
+    // hbot.gotoPosition({ 0, 0 });
     hbot.gotoPosition({ 200, 250 }, 500);
+    // hbot.gotoPosition({ 200, 250 }, 500);
 }
 
 void loop() {

@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "Motor.hpp"
+#include "motor.hpp"
 #include "hbot.hpp"
 
 HBot::HBot(Motor* leftMotor, Motor* rightMotor, int switchPin)
@@ -32,8 +32,8 @@ void HBot::calibrate(int speed) {
  */
 void HBot::gotoPosition(Position position, int speed) {
     // Convert position to diagonal vector
-    if (position.x < 0 || position.y < 0) return;
-    if (position.x > X_LIMIT || position.y > Y_LIMIT) return;
+    if (position.x < 0 || position.x > X_LIMIT) return;
+    if (position.y < 0 || position.y > Y_LIMIT) return;
     Vector diagonal = toDiagonal(position);
 
     // Calculate the delta
@@ -135,5 +135,7 @@ void HBot::move(Vector vector, int speed) {
  * @return Vector 
  */
 Vector HBot::toDiagonal(Position position) {
-    return { (position.x - position.y) * STEPS_PER_MM,  (position.x + position.y) * STEPS_PER_MM };
+    double left = (double) (position.x - position.y) * STEPS_PER_MM;
+    double right = (double) (position.x + position.y) * STEPS_PER_MM;
+    return { (int) left, (int) right};
 }
