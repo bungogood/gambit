@@ -17,7 +17,11 @@ public:
 
     Motor(int enablePin, int dirPin, int stepPin, int stepsPerRevolution);
 
-    void reset() { position = 0; }
+    void reset() {
+        position = 0;
+        disable();
+        setDirection(CW);
+    }
 
     void enable() { 
         digitalWrite(enablePin, LOW);

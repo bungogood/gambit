@@ -5,18 +5,14 @@
 Motor leftMotor(2, 3, 4, 200);
 Motor rightMotor(5, 6, 7, 200);
 
-HBot hbot(leftMotor, rightMotor, 8);
+HBot hbot(&leftMotor, &rightMotor, 8);
 
 void setup() {
     Serial.begin(9600);
     Serial.println("Starting...");
-    // hbot.calibrate();
+    hbot.calibrate();
     Serial.println("Calibrated");
-    hbot.gotoPosition({ 0, -200 });
-    hbot.gotoPosition({ 0, 200 });
-    // hbot.gotoPosition({ 0, 500 });
-    // hbot.gotoPosition({ 500, 0 });
-    // hbot.gotoPosition({ 0, -500 });
+    hbot.gotoPosition({ 200, 250 }, 500);
 }
 
 void loop() {

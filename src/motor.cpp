@@ -7,8 +7,7 @@ Motor::Motor(int enablePin, int dirPin, int stepPin, int stepsPerRevolution)
     pinMode(enablePin, OUTPUT);
     pinMode(dirPin, OUTPUT);
     pinMode(stepPin, OUTPUT);
-    disable();
-    setDirection(CW);
+    reset();
 }
 
 void Motor::stepInit() {
@@ -17,7 +16,7 @@ void Motor::stepInit() {
 
 void Motor::stepEnd() {
     digitalWrite(stepPin, LOW);
-    position += direction ? 1 : -1;
+    position += direction ? -1 : 1;
 }
 
 /**
@@ -30,6 +29,7 @@ void Motor::step(int interval) {
     delayMicroseconds(1000);
     stepEnd();
     delayMicroseconds(1000);
+    position += direction ? -1 : 1;
 }
 
 /**
