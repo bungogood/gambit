@@ -29,7 +29,6 @@ void Motor::step(int interval) {
     delayMicroseconds(interval);
     stepEnd();
     delayMicroseconds(interval);
-    position += direction ? -1 : 1;
 }
 
 /**

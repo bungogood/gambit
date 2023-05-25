@@ -64,17 +64,13 @@ void HBot::move(Vector vector, int speed) {
         delayMicroseconds(speed);
         larger->stepEnd();
         smaller->stepEnd();
+        delayMicroseconds(speed);
     }
 
     larger->steps(maxSteps - steps, speed);
     
     leftMotor->disable();
     rightMotor->disable();
-
-    Serial.print(leftMotor->getPosition());
-    Serial.print(", ");
-    Serial.print(rightMotor->getPosition());
-    Serial.println();
 }
 
 /*
