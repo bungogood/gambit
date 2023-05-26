@@ -1,7 +1,5 @@
 #include <Arduino.h>
-#include "magnet.hpp"
-#include "motor.hpp"
-#include "hbot.hpp"
+#include "board.hpp"
 
 Magnet leftMagnet (9, {-30,  0 });
 Magnet rightMagnet(9, { 30,  0 });
@@ -13,10 +11,12 @@ Motor rightMotor(5, 6, 7, 200);
 
 HBot hbot(&leftMotor, &rightMotor, 8);
 
+Board board(&hbot);
+
 void setup() {
     Serial.begin(9600);
     Serial.println("Starting...");
-    hbot.calibrate();
+    board.calibrate();
     Serial.println("Calibrated");
     int speed = 400;
     hbot.gotoPosition({ 100, 100 }, speed);

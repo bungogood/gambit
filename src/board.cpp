@@ -20,6 +20,6 @@ void Board::gotoSquare(Square square, int speed) {
 void Board::move(Move move, int speed) {
     // add multiphase move support
     // if knight, capture, castle move then move to center of square
-    gotoSquare(move.from, speed);
-    gotoSquare(move.to, speed);
+    gotoSquare(move.source_square, speed);
+    gotoSquare(move.target_square, speed);
 }
