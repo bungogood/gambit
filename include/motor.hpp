@@ -23,15 +23,8 @@ public:
         setDirection(CW);
     }
 
-    void enable() { 
-        digitalWrite(enablePin, LOW);
-        enabled = true;
-    }
-    void disable() { 
-        digitalWrite(enablePin, HIGH);
-        enabled = false;
-    }
-
+    void enable();
+    void disable();
     void step(int interval = DEFAULT_INTERVAL);
     void steps(int steps, int interval = DEFAULT_INTERVAL);
     void stepInit();

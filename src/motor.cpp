@@ -10,6 +10,16 @@ Motor::Motor(int enablePin, int dirPin, int stepPin, int stepsPerRevolution)
     reset();
 }
 
+void Motor::enable() {
+    digitalWrite(enablePin, LOW);
+    enabled = true;
+}
+
+void Motor::disable() {
+    digitalWrite(enablePin, HIGH);
+    enabled = false;
+}
+
 void Motor::stepInit() {
     digitalWrite(stepPin, HIGH);
 }
