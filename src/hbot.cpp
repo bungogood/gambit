@@ -13,13 +13,12 @@ HBot::HBot(Motor* leftMotor, Motor* rightMotor, int switchPin)
  * @param speed movement speed
  */
 void HBot::calibrate(int speed) {
-    leftMotor->disable();
-    rightMotor->enable();
-    rightMotor->setDirection(CW);
-    while (digitalRead(switchPin) == LOW) {
-        rightMotor->step(speed);
-    }
+    rightMotor->disable();
     leftMotor->enable();
+    leftMotor->setDirection(CCW);
+    while (digitalRead(switchPin) == LOW) {
+        leftMotor->step(speed);
+    }
     leftMotor->reset();
     rightMotor->reset();
 }
@@ -42,8 +41,8 @@ void HBot::gotoPosition(Position position, int speed) {
 
 
 void HBot::move(Vector vector, int speed) {
-    leftMotor->setDirection(vector.x < 0);
-    rightMotor->setDirection(vector.y < 0);
+    leftMotor->setDirection(vector.x > 0);
+    rightMotor->setDirection(vector.y > 0);
 
     vector.x = abs(vector.x);
     vector.y = abs(vector.y);
@@ -71,6 +70,10 @@ void HBot::move(Vector vector, int speed) {
     
     leftMotor->disable();
     rightMotor->disable();
+
+    Serial.print(leftMotor->getPosition());
+    Serial.print(", ");
+    Serial.println(rightMotor->getPosition());
 }
 
 /*
@@ -131,7 +134,7 @@ void HBot::move(Vector vector, int speed) {
  * @return Vector 
  */
 Vector HBot::toDiagonal(Position position) {
-    double left = (double) (position.x - position.y) * STEPS_PER_MM;
-    double right = (double) (position.x + position.y) * STEPS_PER_MM;
-    return { (int) left, (int) right};
+    double left  = (double) (position.y + position.x) * STEPS_PER_MM;
+    double right = (double) (position.y - position.x) * STEPS_PER_MM;
+    return { (int) left, (int) right };
 }

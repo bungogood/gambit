@@ -26,7 +26,7 @@ void Motor::stepInit() {
 
 void Motor::stepEnd() {
     digitalWrite(stepPin, LOW);
-    position += direction ? -1 : 1;
+    position += direction ? 1 : -1;
 }
 
 /**
