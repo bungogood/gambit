@@ -208,6 +208,60 @@ Chess::Chess() {
 
 /*********************************************************************************\
 ;---------------------------------------------------------------------------------;
+;                                Helper Functions                                 ;
+;---------------------------------------------------------------------------------;
+\*********************************************************************************/
+
+unsigned long long Chess::get_occupied(){
+    unsigned long long output = 0;
+    int offset = 0; // to skip over the unwanted parts of board_array
+    for(int i = 0; i<64; i++){
+        unsigned long long temp = 0;
+        if(i != 0 && i%8 ==0){
+            offset += 8;
+        }
+        if(board_array[i+offset] > 0) {
+            temp = 1ULL<<(63-i);
+            output += temp;
+        }
+    }
+    return output;
+}
+
+unsigned long long Chess::get_white(){
+    unsigned long long output = 0;
+    int offset = 0;
+    for(int i = 0; i<64; i++){
+        unsigned long long temp = 0;
+        if(i != 0 && i%8 ==0){
+            offset += 8;
+        }
+        if(board_array[i+offset] > 0 && board_array[i+offset] < 18 || board_array[i+offset] == 43 || board_array[i+offset] == 46) {
+            temp = 1ULL<<(63-i);
+            output += temp;
+        }
+    }
+    return output;
+}
+
+unsigned long long Chess::get_black(){
+    unsigned long long output = 0;
+    int offset = 0;
+    for(int i = 0; i<64; i++){
+        unsigned long long temp = 0;
+        if(i != 0 && i%8 ==0){
+            offset += 8;
+        }
+        if(board_array[i+offset] >=18 && board_array[i+offset] < 24 || board_array[i+offset] == 51 || board_array[i+offset] == 54) {
+            temp = 1ULL<<(63-i);
+            output += temp;
+        }
+    }
+    return output;
+}
+
+/*********************************************************************************\
+;---------------------------------------------------------------------------------;
 ;                                MOVE GENERATION                                  ;
 ;---------------------------------------------------------------------------------;
 \*********************************************************************************/
@@ -341,7 +395,9 @@ int Chess::quiescence_search(int side, int en_passant, int alpha, int beta) { //
 }
 
 int Chess::search_position(int side, int en_passant, int alpha, int beta, int depth, Search_Info *search_info) {
-    Move_List move_list[1];  int old_alpha = alpha; Move move;  // x - old alpha
+    Move_List move_list[1];  
+    int old_alpha = alpha; 
+    Move move;
     
     if (!depth) return quiescence_search(side, en_passant, alpha, beta);
     if (!generate_moves(side, en_passant, move_list, 0)) return 10000;  // checkmate evaluation
@@ -406,7 +462,7 @@ void Chess::print_board() {
     
     printf("\n     a b c d e f g h\n\nYour move: ");
 }
-
+/*
 int main() {
     Chess chess;
     Search_Info search_info[1];
@@ -462,3 +518,4 @@ int main() {
     
     return 0;
 }
+*/
