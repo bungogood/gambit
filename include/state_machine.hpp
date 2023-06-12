@@ -11,5 +11,6 @@ enum State {
     CastlingPutRookDown,
     InvalidPiecePU,
     InvalidMove,
-    Error
+    Error,
+    MoveComplete
 };

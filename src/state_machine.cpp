@@ -27,34 +27,48 @@ unsigned long long get_bitboard_from_square(int square){
     return 1ull<<(63 - ((div/2*8) + mod));
 }
 
+void get_moves_for_square(Move_List *move_list, Move_List *current_square_moves, int square){
+    current_square_moves->length = 0;
+    for(int i = 0; i < move_list->length; i++){
+        printf("SEARCHING %d\n", i);
+        if(move_list->moves[i].source_square == square){
+            printf("FOUND\n");
+            printf("Target square: %d\n", move_list->moves[i].target_square);
+            printf("%d\n", current_square_moves->length);
+            current_square_moves->moves[current_square_moves->length] = move_list->moves[i];
+            current_square_moves->length ++;
+        }
+    }
+    printf("Searching complete, found %d moves\n", current_square_moves->length);
+}
+
 /*********************************************************************************\
 ;---------------------------------------------------------------------------------;
 ;                                Actual Functions                                 ;
 ;---------------------------------------------------------------------------------;
 \*********************************************************************************/
 
-State update_state(Chess chess, int instruction, bool colour, State state, int state_memory[]){
+State update_state(Chess *chess, int instruction, int side, State state, int state_memory[], 
+    Move_List *move_list, Move_List *current_square_moves){
     //chess.print_board();
     unsigned long long square = get_bitboard_from_square(instruction);
-    unsigned long long occupied = chess.get_occupied();
+    unsigned long long occupied = chess->get_occupied();
     unsigned long long friendlies;
     unsigned long long enemies;
 
-    if(colour){  //black turn
-        friendlies = chess.get_black();
-        enemies = chess.get_white();
+    if(side == 16){  //black turn
+        friendlies = chess->get_black();
+        enemies = chess->get_white();
     }
     else{ //white turn
-        friendlies = chess.get_white();
-        enemies = chess.get_black();
+        friendlies = chess->get_white();
+        enemies = chess->get_black();
     }
-
-    printf("%llu \n", friendlies & square);
-    printf("%d \n", ((friendlies & square) == 0ull));
 
     switch(state){
         case Idle:
             if((friendlies & square) != 0ULL){
+                get_moves_for_square(move_list, current_square_moves, instruction);
                 state_memory[0] = instruction;
                 return State::FriendlyPU;
             }
@@ -66,8 +80,6 @@ State update_state(Chess chess, int instruction, bool colour, State state, int s
             }
             break;
         case FriendlyPU:
-            Move_List move_list[1];
-            chess.generate_moves(colour, 128/*change that later*/, move_list, false);
             if(instruction == state_memory[0]){
                 return State::Idle;
             }
@@ -75,7 +87,13 @@ State update_state(Chess chess, int instruction, bool colour, State state, int s
                 return State::InvalidPiecePU;
             }
             else{
-                chess.make_move(colour, chess.move)
+                for(int i = 0; i < current_square_moves->length; i++){
+                    if(current_square_moves->moves[i].target_square == instruction){
+                        chess->make_move(side, current_square_moves->moves[i]);
+                        printf("MOVE COMMITTED \n");
+                        return State::MoveComplete;
+                    }
+                }
             }
             break;
     }
@@ -90,25 +108,35 @@ State update_state(Chess chess, int instruction, bool colour, State state, int s
 \*********************************************************************************/
 
 int main() {
+    //variable setup
     Chess chess;
     enum State state = Idle;
     int state_memory[] = {0};
+    Move_List move_list[1];
+    Move_List current_square_moves[1];
 
     printf("hello world\n");
     printf("%d \n", state);
 
     print_bitboard(chess.get_occupied());
     printf("\n");
-    bool colour = 0; //false = white, true = black
-    while(true){
-        int square;
-        printf("Type number of square: \n");
-        printf("current state is: %d \n", state);
-        scanf("%d", &square);
-        printf("the square is %d \n", square);
-        state = update_state(chess, square, colour, state, state_memory);
-        printf("current state is: %d \n", state);
-        if(colour) {colour = false;} else {colour = true;}
+    int side = 8; //8 = white, 16 = black
+    while(true){chess.generate_moves(side,128/*change later*/, move_list, 0);
+        printf("AAAAAAAAAAAAAAAAAAAA %d \n",move_list->length);
+        chess.print_board();
+        while(true){
+            int square;
+            printf("Type number of square: \n");
+            printf("current state is: %d \n", state);
+            scanf("%d", &square);
+            printf("the square is %d \n", square);
+            state = update_state(&chess, square, side, state, state_memory, move_list, current_square_moves);
+            if(state == State::MoveComplete) break;
+            printf("current state is: %d \n", state);
+        }
+        state = State::Idle;
+        printf("move complete\n");
+        side = 24 - side;
     }
 }
 

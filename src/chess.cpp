@@ -297,20 +297,27 @@ inline int Chess::evaluate_position(int side) {
     return (side == 8) ? score : -score;
 }
 
-inline int Chess::generate_moves(int side, int en_passant, Move_List *move_list, bool only_captures) {
-    Move move; move.promoted_piece = 0; int directions; move_list->length = 0; move.source_square = 0;
+int Chess::generate_moves(int side, int en_passant, Move_List *move_list, bool only_captures) {
+    Move move;
+    move.promoted_piece = 0;
+    int directions;
+    move_list->length = 0;
+    move.source_square = 0;
     
     do { // loop over board pieces
         move.piece = board_array[move.source_square];
         
         if (move.piece & side) {
-            move.piece_type = move.piece & 7; directions = move_offsets[move.piece_type + 30];
+            move.piece_type = move.piece & 7;
+            directions = move_offsets[move.piece_type + 30];
             move.step_vector_ray = move_offsets[++directions];
             while (move.step_vector_ray) { // loop over directions
-                move.target_square = move.source_square; move.skip_square = move.rook_square = 128;
+                move.target_square = move.source_square;
+                move.skip_square = move.rook_square = 128;
                
                 do { // loop over squares
-                    move.target_square += move.step_vector_ray; move.captured_square = move.target_square;
+                    move.target_square += move.step_vector_ray; 
+                    move.captured_square = move.target_square;
                     
                     if (move.target_square & 0x88) break;
                     if (move.piece_type < 3 && move.target_square == en_passant) move.captured_square = move.target_square ^ 16; move.capture = board_array[move.captured_square];
@@ -434,7 +441,9 @@ int Chess::search_position(int side, int en_passant, int alpha, int beta, int de
 \*********************************************************************************/
 
 Move Chess::parse_move(int side, int en_passant, char *move_string) {
-    Move_List move_list[1]; Move move; generate_moves(side, en_passant, move_list, 0);
+    Move_List move_list[1];
+    Move move;
+    generate_moves(side, en_passant, move_list, 0);
     
     for(int i = 0; i < move_list->length; i++) {
         move = move_list->moves[i];
