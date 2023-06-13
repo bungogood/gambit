@@ -14,3 +14,8 @@ enum State {
     Error,
     MoveComplete
 };
+
+typedef struct{
+    int memory[3];
+    int length;
+} State_Memory;
