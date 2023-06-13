@@ -260,6 +260,10 @@ unsigned long long Chess::get_black(){
     return output;
 }
 
+int Chess::get_piece_on_square(int square){
+    return board_array[square];
+}
+
 /*********************************************************************************\
 ;---------------------------------------------------------------------------------;
 ;                                MOVE GENERATION                                  ;
