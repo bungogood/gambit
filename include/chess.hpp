@@ -40,11 +40,15 @@ class Chess {
     };
 public:
     Chess();
+    unsigned long long get_occupied();
+    unsigned long long get_white();
+    unsigned long long get_black();
+    int get_piece_on_square(int square);
     void print_board();
     Move parse_move(int side, int en_passant, char *move_string);
     int search_position(int side, int en_passant, int alpha, int beta, int depth, Search_Info *search_info);
     int quiescence_search(int side, int en_passant, int alpha, int beta);
-    inline int generate_moves(int side, int en_passant, Move_List *move_list, bool only_captures);
+    int generate_moves(int side, int en_passant, Move_List *move_list, bool only_captures);
     inline int evaluate_position(int side);
     inline void unmake_move(int side, Move move);
     void make_move(int side, Move move);
