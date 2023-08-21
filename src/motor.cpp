@@ -4,6 +4,10 @@
 Motor::Motor(int enablePin, int dirPin, int stepPin, int stepsPerRevolution)
     : enablePin(enablePin), dirPin(dirPin), stepPin(stepPin), stepsPerRevolution(stepsPerRevolution)
 {
+    init();
+}
+
+void Motor::init() {
     pinMode(enablePin, OUTPUT);
     pinMode(dirPin, OUTPUT);
     pinMode(stepPin, OUTPUT);

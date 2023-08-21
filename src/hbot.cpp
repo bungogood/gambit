@@ -7,6 +7,12 @@ HBot::HBot(Motor* leftMotor, Motor* rightMotor, int switchPin)
 {
 }
 
+void HBot::init() {
+    leftMotor->init();
+    rightMotor->init();
+    pinMode(switchPin, INPUT);
+}
+
 /**
  * @brief Calibrates the motors to the switch
  * 

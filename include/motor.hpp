@@ -17,6 +17,8 @@ public:
 
     Motor(int enablePin, int dirPin, int stepPin, int stepsPerRevolution);
 
+    void init();
+
     void reset() {
         position = 0;
         disable();

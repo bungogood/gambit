@@ -5,6 +5,10 @@ Board::Board(HBot* hbot)
 {
 }
 
+void Board::init() {
+    hbot->init();
+}
+
 void Board::calibrate(int speed) {
     hbot->calibrate(speed);
 }

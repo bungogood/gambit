@@ -26,6 +26,8 @@ class HBot {
 public:
     HBot(Motor* leftMotor, Motor* rightMotor, int switchPin);
 
+    void init();
+
     Vector toDiagonal(Position position);
     void move(Vector vector, int speed);
 

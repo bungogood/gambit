@@ -13,6 +13,8 @@ class Board {
 public:
     Board(HBot* hbot);
 
+    void init();
+
     void calibrate(int speed = CALIBRATION_SPEED);
     void move(Move move, int speed = DEFAULT_SPEED);
     void gotoSquare(Square square, int speed = DEFAULT_SPEED);
