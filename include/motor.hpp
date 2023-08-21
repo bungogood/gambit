@@ -9,7 +9,7 @@ class Motor {
     bool direction;
     int position;
 
-public:
+   public:
     const int enablePin;
     const int dirPin;
     const int stepPin;

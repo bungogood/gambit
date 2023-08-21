@@ -1,23 +1,14 @@
 #include "board.hpp"
 
-Board::Board(HBot* hbot)
-    : hbot(hbot)
-{
-}
+Board::Board(HBot* hbot) : hbot(hbot) {}
 
-void Board::init() {
-    hbot->init();
-}
+void Board::init() { hbot->init(); }
 
-void Board::calibrate(int speed) {
-    hbot->calibrate(speed);
-}
+void Board::calibrate(int speed) { hbot->calibrate(speed); }
 
 void Board::gotoSquare(Square square, int speed) {
-    Position position = {
-        (square % 8) * SQUARE_SIZE + OFFSET_FILE,
-        (square / 8) * SQUARE_SIZE + OFFSET_RANK
-    };
+    Position position = {(square % 8) * SQUARE_SIZE + OFFSET_FILE,
+                         (square / 8) * SQUARE_SIZE + OFFSET_RANK};
     hbot->gotoPosition(position, speed);
 }
 

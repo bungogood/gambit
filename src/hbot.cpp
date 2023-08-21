@@ -1,11 +1,11 @@
-#include <Arduino.h>
-#include "motor.hpp"
 #include "hbot.hpp"
 
+#include <Arduino.h>
+
+#include "motor.hpp"
+
 HBot::HBot(Motor* leftMotor, Motor* rightMotor, int switchPin)
-    : leftMotor(leftMotor), rightMotor(rightMotor), switchPin(switchPin)
-{
-}
+    : leftMotor(leftMotor), rightMotor(rightMotor), switchPin(switchPin) {}
 
 void HBot::init() {
     leftMotor->init();
@@ -15,7 +15,7 @@ void HBot::init() {
 
 /**
  * @brief Calibrates the motors to the switch
- * 
+ *
  * @param speed movement speed
  */
 void HBot::calibrate(int speed) {
@@ -31,7 +31,7 @@ void HBot::calibrate(int speed) {
 
 /**
  * @brief Moves HBot to a position (mm)
- * 
+ *
  * @param position destination position
  * @param speed movement speed
  */
@@ -42,9 +42,10 @@ void HBot::gotoPosition(Position position, int speed) {
     Vector diagonal = toDiagonal(position);
 
     // Calculate the delta
-    move({ diagonal.x - leftMotor->getPosition(), diagonal.y - rightMotor->getPosition() }, speed);
+    move({diagonal.x - leftMotor->getPosition(),
+          diagonal.y - rightMotor->getPosition()},
+         speed);
 }
-
 
 void HBot::move(Vector vector, int speed) {
     leftMotor->setDirection(vector.x > 0);
@@ -59,8 +60,8 @@ void HBot::move(Vector vector, int speed) {
     int minSteps = min(vector.x, vector.y);
     int maxSteps = max(vector.x, vector.y);
 
-    Motor *larger  = vector.x > vector.y ? leftMotor : rightMotor;
-    Motor *smaller = vector.x > vector.y ? rightMotor : leftMotor;
+    Motor* larger = vector.x > vector.y ? leftMotor : rightMotor;
+    Motor* smaller = vector.x > vector.y ? rightMotor : leftMotor;
 
     int steps = 0;
     for (; steps < minSteps; steps++) {
@@ -73,7 +74,7 @@ void HBot::move(Vector vector, int speed) {
     }
 
     larger->steps(maxSteps - steps, speed);
-    
+
     leftMotor->disable();
     rightMotor->disable();
 
@@ -135,12 +136,12 @@ void HBot::move(Vector vector, int speed) {
 
 /**
  * @brief Converts a position (mm) to a diagonal vector (steps)
- * 
- * @param position 
- * @return Vector 
+ *
+ * @param position
+ * @return Vector
  */
 Vector HBot::toDiagonal(Position position) {
-    double left  = (double) (position.y + position.x) * STEPS_PER_MM;
-    double right = (double) (position.y - position.x) * STEPS_PER_MM;
-    return { (int) left, (int) right };
+    double left = (double)(position.y + position.x) * STEPS_PER_MM;
+    double right = (double)(position.y - position.x) * STEPS_PER_MM;
+    return {(int)left, (int)right};
 }

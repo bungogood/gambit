@@ -4,7 +4,8 @@
 
 class Magnet {
     bool enabled = false;
-public:
+
+   public:
     const int pin;
     const Vector offset;
 

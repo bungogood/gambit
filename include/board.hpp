@@ -1,16 +1,17 @@
 #pragma once
 
-#include "magnet.hpp"
 #include "chess.hpp"
 #include "hbot.hpp"
+#include "magnet.hpp"
 
 #define SQUARE_SIZE 50
-#define OFFSET_RANK 25 // 1-8
-#define OFFSET_FILE 50 // A-H
+#define OFFSET_RANK 25  // 1-8
+#define OFFSET_FILE 50  // A-H
 
 class Board {
     HBot* hbot;
-public:
+
+   public:
     Board(HBot* hbot);
 
     void init();

@@ -15,7 +15,7 @@ enum State {
     MoveComplete
 };
 
-typedef struct{
+typedef struct {
     int memory[3];
     int length;
 } State_Memory;

@@ -23,7 +23,8 @@ class HBot {
     Motor* rightMotor;
 
     int switchPin;
-public:
+
+   public:
     HBot(Motor* leftMotor, Motor* rightMotor, int switchPin);
 
     void init();

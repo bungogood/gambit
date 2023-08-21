@@ -1,9 +1,12 @@
-#include <Arduino.h>
 #include "motor.hpp"
 
+#include <Arduino.h>
+
 Motor::Motor(int enablePin, int dirPin, int stepPin, int stepsPerRevolution)
-    : enablePin(enablePin), dirPin(dirPin), stepPin(stepPin), stepsPerRevolution(stepsPerRevolution)
-{
+    : enablePin(enablePin),
+      dirPin(dirPin),
+      stepPin(stepPin),
+      stepsPerRevolution(stepsPerRevolution) {
     init();
 }
 
@@ -24,9 +27,7 @@ void Motor::disable() {
     enabled = false;
 }
 
-void Motor::stepInit() {
-    digitalWrite(stepPin, HIGH);
-}
+void Motor::stepInit() { digitalWrite(stepPin, HIGH); }
 
 void Motor::stepEnd() {
     digitalWrite(stepPin, LOW);
@@ -35,8 +36,8 @@ void Motor::stepEnd() {
 
 /**
  * @brief Motor moves one step
- * 
- * @param interval 
+ *
+ * @param interval
  */
 void Motor::step(int interval) {
     stepInit();
@@ -47,20 +48,20 @@ void Motor::step(int interval) {
 
 /**
  * @brief Steps the motor a certain amount of steps
- * 
+ *
  * @param steps number of steps to take
  * @param interval
  */
 void Motor::steps(int steps, int interval) {
     enable();
-    for(int i = 0; i < steps; i++) {
+    for (int i = 0; i < steps; i++) {
         step(interval);
     }
 }
 
 /**
  * @brief Sets the direction of the motor
- * 
+ *
  * @param dir true being clockwise, false being counter-clockwise
  */
 void Motor::setDirection(bool dir) {

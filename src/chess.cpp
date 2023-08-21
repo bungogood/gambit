@@ -1,5 +1,6 @@
 #include "chess.hpp"
 
+// clang-format off
 /*********************************************************************************\
 ;                               nibble-chess v1.0                                 ;
 ;---------------------------------------------------------------------------------;
@@ -172,35 +173,30 @@
 //  P() - print board                                                            //
 //                                                                               //
 ///////////////////////////////////////////////////////////////////////////////////
-
+// clang-format on
 #include <stdio.h>
 #include <string.h>
 
 /*********************************************************************************\
 ;---------------------------------------------------------------------------------;
-;                              BOARD REPRESENTATION                               ;
+;                              BOARD REPRESENTATION ;
 ;---------------------------------------------------------------------------------;
 \*********************************************************************************/
 
 // promoted pieces
-const char promoted_pieces[8] = {
-    0, 0, 0, 0, 'n', 'b', 'r', 'q'
-};
+const char promoted_pieces[8] = {0, 0, 0, 0, 'n', 'b', 'r', 'q'};
 
 const char promoted_pieces_string[] = ".-pknbrq-P-KNBRQ";
 
 // move offsets
 static const int move_offsets[] = {
-   15,  16,  17,   0,
-  -15, -16, -17,   0,
-    1,  16,  -1, -16,   0,
-    1,  16,  -1, -16,  15, -15, 17, -17,  0,
-   14, -14,  18, -18,  31, -31, 33, -33,  0, 
-    3,  -1,  12,  21,  16,   7, 12
-};
+    15, 16,  17, 0,   -15, -16, -17, 0,   1,  16, -1,  -16, 0,
+    1,  16,  -1, -16, 15,  -15, 17,  -17, 0,  14, -14, 18,  -18,
+    31, -31, 33, -33, 0,   3,   -1,  12,  21, 16, 7,   12};
 
 // piece weights
-static const int piece_weights[] = { 0, 0, -100, 0, -300, -350, -500, -900, 0, 100, 0, 0, 300, 350, 500, 900 };
+static const int piece_weights[] = {0, 0,   -100, 0, -300, -350, -500, -900,
+                                    0, 100, 0,    0, 300,  350,  500,  900};
 
 Chess::Chess() {
     // initialize board
@@ -208,92 +204,98 @@ Chess::Chess() {
 
 /*********************************************************************************\
 ;---------------------------------------------------------------------------------;
-;                                Helper Functions                                 ;
+;                                Helper Functions ;
 ;---------------------------------------------------------------------------------;
 \*********************************************************************************/
 
-unsigned long long Chess::get_occupied(){
+unsigned long long Chess::get_occupied() {
     unsigned long long output = 0;
-    int offset = 0; // to skip over the unwanted parts of board_array
-    for(int i = 0; i<64; i++){
+    int offset = 0;  // to skip over the unwanted parts of board_array
+    for (int i = 0; i < 64; i++) {
         unsigned long long temp = 0;
-        if(i != 0 && i%8 ==0){
+        if (i != 0 && i % 8 == 0) {
             offset += 8;
         }
-        if(board_array[i+offset] > 0) {
-            temp = 1ULL<<(63-i);
+        if (board_array[i + offset] > 0) {
+            temp = 1ULL << (63 - i);
             output += temp;
         }
     }
     return output;
 }
 
-unsigned long long Chess::get_white(){
-    unsigned long long output = 0;
-    int offset = 0;
-    for(int i = 0; i<64; i++){
-        unsigned long long temp = 0;
-        if(i != 0 && i%8 ==0){
-            offset += 8;
-        }
-        if(board_array[i+offset] > 0 && board_array[i+offset] < 18 || board_array[i+offset] == 43 || board_array[i+offset] == 46) {
-            temp = 1ULL<<(63-i);
-            output += temp;
-        }
-    }
-    return output;
-}
-
-unsigned long long Chess::get_black(){
+unsigned long long Chess::get_white() {
     unsigned long long output = 0;
     int offset = 0;
-    for(int i = 0; i<64; i++){
+    for (int i = 0; i < 64; i++) {
         unsigned long long temp = 0;
-        if(i != 0 && i%8 ==0){
+        if (i != 0 && i % 8 == 0) {
             offset += 8;
         }
-        if(board_array[i+offset] >=18 && board_array[i+offset] < 24 || board_array[i+offset] == 51 || board_array[i+offset] == 54) {
-            temp = 1ULL<<(63-i);
+        if (board_array[i + offset] > 0 && board_array[i + offset] < 18 ||
+            board_array[i + offset] == 43 || board_array[i + offset] == 46) {
+            temp = 1ULL << (63 - i);
             output += temp;
         }
     }
     return output;
 }
 
-int Chess::get_piece_on_square(int square){
-    return board_array[square];
+unsigned long long Chess::get_black() {
+    unsigned long long output = 0;
+    int offset = 0;
+    for (int i = 0; i < 64; i++) {
+        unsigned long long temp = 0;
+        if (i != 0 && i % 8 == 0) {
+            offset += 8;
+        }
+        if (board_array[i + offset] >= 18 && board_array[i + offset] < 24 ||
+            board_array[i + offset] == 51 || board_array[i + offset] == 54) {
+            temp = 1ULL << (63 - i);
+            output += temp;
+        }
+    }
+    return output;
 }
+
+int Chess::get_piece_on_square(int square) { return board_array[square]; }
 
 /*********************************************************************************\
 ;---------------------------------------------------------------------------------;
-;                                MOVE GENERATION                                  ;
+;                                MOVE GENERATION ;
 ;---------------------------------------------------------------------------------;
 \*********************************************************************************/
 
 inline void Chess::make_move(int side, Move move) {
-    board_array[move.rook_square] = board_array[move.captured_square] = board_array[move.source_square] = 0; board_array[move.target_square] = move.piece & 31;
+    board_array[move.rook_square] = board_array[move.captured_square] =
+        board_array[move.source_square] = 0;
+    board_array[move.target_square] = move.piece & 31;
 
     if (!(move.rook_square & 0x88)) board_array[move.skip_square] = side + 6;
-    
-    if (move.piece_type < 3)
-    {
-        if (move.target_square + move.step_vector_ray + 1 & 128) board_array[move.target_square] = side + move.promoted_piece;
+
+    if (move.piece_type < 3) {
+        if (move.target_square + move.step_vector_ray + 1 & 128)
+            board_array[move.target_square] = side + move.promoted_piece;
     }
 }
 
-
 inline void Chess::unmake_move(int side, Move move) {
-    board_array[move.rook_square] = side + 38; board_array[move.skip_square] = board_array[move.target_square] = 0; board_array[move.source_square] = move.piece; board_array[move.captured_square] = move.capture;
+    board_array[move.rook_square] = side + 38;
+    board_array[move.skip_square] = board_array[move.target_square] = 0;
+    board_array[move.source_square] = move.piece;
+    board_array[move.captured_square] = move.capture;
 }
 
 inline int Chess::evaluate_position(int side) {
-    int score = 0; int i = 0, position;
-    
+    int score = 0;
+    int i = 0, position;
+
     do {
         position = board_array[i];
         if (position) {
-            score += piece_weights[position & 15]; // material score
-            (position & 8) ? (score += board_array[i + 8]) : (score -= board_array[i + 8]); // positional score
+            score += piece_weights[position & 15];  // material score
+            (position & 8) ? (score += board_array[i + 8])
+                           : (score -= board_array[i + 8]);  // positional score
         }
         i = (i + 9) & ~0x88;
     } while (i);
@@ -301,64 +303,93 @@ inline int Chess::evaluate_position(int side) {
     return (side == 8) ? score : -score;
 }
 
-int Chess::generate_moves(int side, int en_passant, Move_List *move_list, bool only_captures) {
+int Chess::generate_moves(int side, int en_passant, Move_List *move_list,
+                          bool only_captures) {
     Move move;
     move.promoted_piece = 0;
     int directions;
     move_list->length = 0;
     move.source_square = 0;
-    
-    do { // loop over board pieces
+
+    do {  // loop over board pieces
         move.piece = board_array[move.source_square];
-        
+
         if (move.piece & side) {
             move.piece_type = move.piece & 7;
             directions = move_offsets[move.piece_type + 30];
             move.step_vector_ray = move_offsets[++directions];
-            while (move.step_vector_ray) { // loop over directions
+            while (move.step_vector_ray) {  // loop over directions
                 move.target_square = move.source_square;
                 move.skip_square = move.rook_square = 128;
-               
-                do { // loop over squares
-                    move.target_square += move.step_vector_ray; 
+
+                do {  // loop over squares
+                    move.target_square += move.step_vector_ray;
                     move.captured_square = move.target_square;
-                    
+
                     if (move.target_square & 0x88) break;
-                    if (move.piece_type < 3 && move.target_square == en_passant) move.captured_square = move.target_square ^ 16; move.capture = board_array[move.captured_square];
-                    if (en_passant - 128 && board_array[en_passant] && move.target_square - en_passant < 2 && en_passant - move.target_square < 2) return 0;
-                    if (move.capture & side || move.piece_type < 3 && !(move.step_vector_ray & 7) != !move.capture) break;
+                    if (move.piece_type < 3 && move.target_square == en_passant)
+                        move.captured_square = move.target_square ^ 16;
+                    move.capture = board_array[move.captured_square];
+                    if (en_passant - 128 && board_array[en_passant] &&
+                        move.target_square - en_passant < 2 &&
+                        en_passant - move.target_square < 2)
+                        return 0;
+                    if (move.capture & side ||
+                        move.piece_type < 3 &&
+                            !(move.step_vector_ray & 7) != !move.capture)
+                        break;
                     if ((move.capture & 7) == 3) return move_list->length = 0;
-				    
+
                     make_move(side, move);  // make move
-                    
+
                     if (move.piece_type < 3) {
-                        if (move.target_square + move.step_vector_ray + 1 & 128) {
-                            board_array[move.target_square] |= 7; move.promoted_piece = board_array[move.target_square] & 7;
+                        if (move.target_square + move.step_vector_ray + 1 &
+                            128) {
+                            board_array[move.target_square] |= 7;
+                            move.promoted_piece =
+                                board_array[move.target_square] & 7;
                         };
                     }
-                    
+
                     do {
-                        move.move_score = evaluate_position(side); // evaluate position for move ordering
-                        if (only_captures && move.capture) { move_list->moves[move_list->length] = move; move_list->length++; }
-                        else if (!only_captures) { move_list->moves[move_list->length] = move; move_list->length++; }
-                        
-                        (move.promoted_piece < 4) ? move.promoted_piece = 0: move.promoted_piece--;
+                        move.move_score = evaluate_position(
+                            side);  // evaluate position for move ordering
+                        if (only_captures && move.capture) {
+                            move_list->moves[move_list->length] = move;
+                            move_list->length++;
+                        } else if (!only_captures) {
+                            move_list->moves[move_list->length] = move;
+                            move_list->length++;
+                        }
+
+                        (move.promoted_piece < 4) ? move.promoted_piece = 0
+                                                  : move.promoted_piece--;
                     }
-                    
-                    while (move.piece_type - board_array[move.target_square]-- & 7 && board_array[move.target_square] & 4);
-                    
+
+                    while (move.piece_type - board_array[move.target_square]-- &
+                               7 &&
+                           board_array[move.target_square] & 4);
+
                     unmake_move(side, move);  // take back
-                    
+
                     move.capture += move.piece_type < 5;
-                    
-                    if (move.piece_type < 3 && 6 * side + (move.target_square & 112) == 128 ||
-                    (((move.piece & ~24) == 35) & (directions == 13 || directions == 15)) &&
-                    move.rook_square & 0x88 && 
-                    board_array[move.rook_square = (move.source_square | 7) - (move.step_vector_ray >> 1 & 7)] & 32 &&
-                    !(board_array[move.rook_square ^ 1] | board_array[move.rook_square ^ 2]))
-                    { move.capture--; move.skip_square = move.target_square;}
+
+                    if (move.piece_type < 3 &&
+                            6 * side + (move.target_square & 112) == 128 ||
+                        (((move.piece & ~24) == 35) &
+                         (directions == 13 || directions == 15)) &&
+                            move.rook_square & 0x88 &&
+                            board_array[move.rook_square =
+                                            (move.source_square | 7) -
+                                            (move.step_vector_ray >> 1 & 7)] &
+                                32 &&
+                            !(board_array[move.rook_square ^ 1] |
+                              board_array[move.rook_square ^ 2])) {
+                        move.capture--;
+                        move.skip_square = move.target_square;
+                    }
                 }
-                
+
                 while (!move.capture);
                 move.step_vector_ray = move_offsets[++directions];
             }
@@ -370,77 +401,92 @@ int Chess::generate_moves(int side, int en_passant, Move_List *move_list, bool o
 
 /*********************************************************************************\
 ;---------------------------------------------------------------------------------;
-;                                      SEARCH                                     ;
+;                                      SEARCH ;
 ;---------------------------------------------------------------------------------;
 \*********************************************************************************/
 
-int Chess::quiescence_search(int side, int en_passant, int alpha, int beta) { // QUIESCENCE SEARCH
+int Chess::quiescence_search(int side, int en_passant, int alpha,
+                             int beta) {  // QUIESCENCE SEARCH
     int score = evaluate_position(side);
-    
+
     if (score >= beta) return beta;
-    if (score > alpha) alpha = score; 
-	
-	Move_List move_list[1];
-	
-	if (!generate_moves(side, en_passant, move_list, 1)) return 10000;  // checkmate evaluation
-	
-	for(int i = 0; i < move_list->length; i++) { // loop over move list
-        for(int j = i + 1; j < move_list->length; j++) {
+    if (score > alpha) alpha = score;
+
+    Move_List move_list[1];
+
+    if (!generate_moves(side, en_passant, move_list, 1))
+        return 10000;  // checkmate evaluation
+
+    for (int i = 0; i < move_list->length; i++) {  // loop over move list
+        for (int j = i + 1; j < move_list->length; j++) {
             // order moves to reduce number of traversed nodes
-            if (move_list->moves[i].move_score < move_list->moves[j].move_score) {
+            if (move_list->moves[i].move_score <
+                move_list->moves[j].move_score) {
                 Move move = move_list->moves[i];
                 move_list->moves[i] = move_list->moves[j];
                 move_list->moves[j] = move;
             }
         }
-        
+
         make_move(side, move_list->moves[i]);  // make move
-        int score = -quiescence_search(24 - side, move_list->moves[i].skip_square, -beta, -alpha);  // recursive quiescence call
+        int score =
+            -quiescence_search(24 - side, move_list->moves[i].skip_square,
+                               -beta, -alpha);   // recursive quiescence call
         unmake_move(side, move_list->moves[i]);  // take back
 
         if (score >= beta) return beta;
-        if (score > alpha) { alpha = score; }
+        if (score > alpha) {
+            alpha = score;
+        }
     }
-    
+
     return alpha;
 }
 
-int Chess::search_position(int side, int en_passant, int alpha, int beta, int depth, Search_Info *search_info) {
-    Move_List move_list[1];  
-    int old_alpha = alpha; 
+int Chess::search_position(int side, int en_passant, int alpha, int beta,
+                           int depth, Search_Info *search_info) {
+    Move_List move_list[1];
+    int old_alpha = alpha;
     Move move;
-    
+
     if (!depth) return quiescence_search(side, en_passant, alpha, beta);
-    if (!generate_moves(side, en_passant, move_list, 0)) return 10000;  // checkmate evaluation
-    
-    for(int i = 0; i < move_list->length; i++) { // loop over move list
-        for(int j = i + 1; j < move_list->length; j++) {
+    if (!generate_moves(side, en_passant, move_list, 0))
+        return 10000;  // checkmate evaluation
+
+    for (int i = 0; i < move_list->length; i++) {  // loop over move list
+        for (int j = i + 1; j < move_list->length; j++) {
             // order moves to reduce number of traversed nodes
-            if (move_list->moves[i].move_score < move_list->moves[j].move_score) {
+            if (move_list->moves[i].move_score <
+                move_list->moves[j].move_score) {
                 Move temp_move = move_list->moves[i];
                 move_list->moves[i] = move_list->moves[j];
                 move_list->moves[j] = temp_move;
             }
         }
-        
+
         make_move(side, move_list->moves[i]);  // make move
-        int score = -search_position(24 - side, move_list->moves[i].skip_square, -beta, -alpha, depth - 1, search_info);  // recursive search call
-        unmake_move(side, move_list->moves[i]);  // take back
+        int score = -search_position(24 - side, move_list->moves[i].skip_square,
+                                     -beta, -alpha, depth - 1,
+                                     search_info);  // recursive search call
+        unmake_move(side, move_list->moves[i]);     // take back
 
         search_info->best_move = move_list->moves[i];  // store best move so far
 
         if (score >= beta) return beta;
-        if (score > alpha) { alpha = score; move = move_list->moves[i]; }
+        if (score > alpha) {
+            alpha = score;
+            move = move_list->moves[i];
+        }
     }
-    
+
     if (alpha != old_alpha) search_info->best_move = move;  // store best move
-    
+
     return alpha;
 }
 
 /*********************************************************************************\
 ;---------------------------------------------------------------------------------;
-;                                       MAIN                                      ;
+;                                       MAIN ;
 ;---------------------------------------------------------------------------------;
 \*********************************************************************************/
 
@@ -448,38 +494,43 @@ Move Chess::parse_move(int side, int en_passant, char *move_string) {
     Move_List move_list[1];
     Move move;
     generate_moves(side, en_passant, move_list, 0);
-    
-    for(int i = 0; i < move_list->length; i++) {
-        move = move_list->moves[i];
-        
-        if (move.source_square == (move_string[0] - 'a') + (7 - (move_string[1] - '0' - 1)) * 16 &&
-            move.target_square == (move_string[2] - 'a') + (7 - (move_string[3] - '0' - 1)) * 16) { 
 
+    for (int i = 0; i < move_list->length; i++) {
+        move = move_list->moves[i];
+
+        if (move.source_square == (move_string[0] - 'a') +
+                                      (7 - (move_string[1] - '0' - 1)) * 16 &&
+            move.target_square == (move_string[2] - 'a') +
+                                      (7 - (move_string[3] - '0' - 1)) * 16) {
             if (move.promoted_piece) {
-                if (promoted_pieces[move.promoted_piece] == move_string[4]) return move;
+                if (promoted_pieces[move.promoted_piece] == move_string[4])
+                    return move;
                 continue;
             }
 
             return move;
         }
     }
-    
-    move.promoted_piece = move.target_square = move.source_square = 0; return move;
+
+    move.promoted_piece = move.target_square = move.source_square = 0;
+    return move;
 }
 
 void Chess::print_board() {
-    for(int i = 0; i < 128; i++) {
+    for (int i = 0; i < 128; i++) {
         if (!(i % 16)) printf(" %d  ", 8 - (i / 16));
-        printf(" %c", ((i & 8) && (i += 7)) ? '\n' : promoted_pieces_string[board_array[i] & 15]);
+        printf(" %c", ((i & 8) && (i += 7))
+                          ? '\n'
+                          : promoted_pieces_string[board_array[i] & 15]);
     }
-    
+
     printf("\n     a b c d e f g h\n\nYour move: ");
 }
 /*
 int main() {
     Chess chess;
     Search_Info search_info[1];
-    
+
     printf(";----------------------------------------------------------;\n");
     printf(";                    nibble-chess v1.0                     ;\n");
     printf(";----------------------------------------------------------;\n");
@@ -488,47 +539,52 @@ int main() {
     printf(";----------------------------------------------------------;\n");
     printf(";                     by Maksim Korzh;                     ;\n");
     printf(";----------------------------------------------------------;\n");
-    
+
     printf("\nenter search depth\n( 2 - 6 recommended)\n");
- 
+
     char move_string[6];
     int side = 8, en_passant_square = 128, depth = getchar() - '0';
-    
+
     printf("\nEnter move in format:\n\n");
     printf(" e2e4 - common move\n");
     printf("g7g8r - pawn promotin\n");
     printf(" e1g1 - castling\n\n");
-    
+
     chess.print_board();  // print board
 
     while (1) { // game loop
         memset(&move_string[0], 0, sizeof(move_string));
-        
+
         if (!fgets(move_string, 6, stdin)) continue;
         if (move_string[0] == '\n') continue;
-            
-        Move move = chess.parse_move(side, en_passant_square, move_string);  // parse move
-        
-        if (!move.source_square && !move.target_square && !move.promoted_piece) { printf("illegal move\n"); continue; }
-        
-        chess.make_move(side, move); side = 24 - side; en_passant_square = move.skip_square; // make move, update side/e.p.
-        chess.print_board();  // print board
-        
-        int score = chess.search_position(side, en_passant_square, -10000, 10000, depth, search_info);  // search position
-        printf("\nScore: %d\n\n", score);
-        
+
+        Move move = chess.parse_move(side, en_passant_square, move_string);  //
+parse move
+
+        if (!move.source_square && !move.target_square && !move.promoted_piece)
+{ printf("illegal move\n"); continue; }
+
+        chess.make_move(side, move); side = 24 - side; en_passant_square =
+move.skip_square; // make move, update side/e.p. chess.print_board();  // print
+board
+
+        int score = chess.search_position(side, en_passant_square, -10000,
+10000, depth, search_info);  // search position printf("\nScore: %d\n\n",
+score);
+
         if (score == 10000 || score == -10000) { // mate
-            chess.make_move(side, search_info->best_move); side = 24 - side; en_passant_square = search_info->best_move.skip_square;
-            chess.print_board(); 
+            chess.make_move(side, search_info->best_move); side = 24 - side;
+en_passant_square = search_info->best_move.skip_square; chess.print_board();
             (score == 10000) ?
             printf("\nWhite is checkmated!\n") :
             printf("\nBlack is checkmated!\n"); break;
         }
-        
-        chess.make_move(side, search_info->best_move); side = 24 - side; en_passant_square = search_info->best_move.skip_square; // make engine's move
+
+        chess.make_move(side, search_info->best_move); side = 24 - side;
+en_passant_square = search_info->best_move.skip_square; // make engine's move
         chess.print_board();  // print board
     }
-    
+
     return 0;
 }
 */
