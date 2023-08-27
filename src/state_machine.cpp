@@ -236,38 +236,38 @@ State update_state(Chess *chess, int instruction, int side, State state,
 ;---------------------------------------------------------------------------------;
 \*********************************************************************************/
 
-int main() {
-    // variable setup
-    Chess chess;
-    enum State state = Idle;
-    Move_List move_list[1];
-    Move_List current_square_moves[1];
-    State_Memory state_memory[1];
+// int main() {
+//     // variable setup
+//     Chess chess;
+//     enum State state = Idle;
+//     Move_List move_list[1];
+//     Move_List current_square_moves[1];
+//     State_Memory state_memory[1];
 
-    printf("hello world\n");
-    printf("%d \n", state);
+//     printf("hello world\n");
+//     printf("%d \n", state);
 
-    print_bitboard(chess.get_occupied());
-    printf("\n");
-    int side = 8;  // 8 = white, 16 = black
-    while (true) {
-        chess.generate_moves(side, 128 /*change later*/, move_list, 0);
-        chess.print_board();
-        while (true) {
-            int square;
-            printf("Type number of square: \n");
-            scanf("%d", &square);
-            printf("the square is %d \n", square);
-            state = update_state(&chess, square, side, state, state_memory,
-                                 move_list, current_square_moves);
-            printf("current state is: %d \n", state);
-            printf("State memory 0: %d\n", state_memory->memory[0]);
-            printf("State memory 1: %d\n", state_memory->memory[1]);
-            if (state == State::MoveComplete) break;
-        }
-        state = State::Idle;
-        printf("move complete\n");
-        state_memory->length = 0;
-        side = 24 - side;
-    }
-}
+//     print_bitboard(chess.get_occupied());
+//     printf("\n");
+//     int side = 8;  // 8 = white, 16 = black
+//     while (true) {
+//         chess.generate_moves(side, 128 /*change later*/, move_list, 0);
+//         chess.print_board();
+//         while (true) {
+//             int square;
+//             printf("Type number of square: \n");
+//             scanf("%d", &square);
+//             printf("the square is %d \n", square);
+//             state = update_state(&chess, square, side, state, state_memory,
+//                                  move_list, current_square_moves);
+//             printf("current state is: %d \n", state);
+//             printf("State memory 0: %d\n", state_memory->memory[0]);
+//             printf("State memory 1: %d\n", state_memory->memory[1]);
+//             if (state == State::MoveComplete) break;
+//         }
+//         state = State::Idle;
+//         printf("move complete\n");
+//         state_memory->length = 0;
+//         side = 24 - side;
+//     }
+// }

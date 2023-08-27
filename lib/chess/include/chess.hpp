@@ -2,6 +2,8 @@
 
 typedef int Square;
 
+const int KNIGHT = 4;
+
 // clang-format off
 const Square 
     SQA1 =  0, SQB1 =  1, SQC1 =  2, SQD1 =  3, SQE1 =  4, SQF1 =  5, SQG1 =  6, SQH1 =  7,
