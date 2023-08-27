@@ -1,9 +1,8 @@
-#include <Arduino.h>
 #include "magnet.hpp"
 
-Magnet::Magnet(int pin, Vector offset)
-    : pin(pin), offset(offset)
-{
+#include <Arduino.h>
+
+Magnet::Magnet(int pin, Coord offset) : pin(pin), offset(offset) {
     pinMode(pin, OUTPUT);
     disable();
 }

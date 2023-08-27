@@ -7,9 +7,9 @@ class Magnet {
 
    public:
     const int pin;
-    const Vector offset;
+    const Coord offset;
 
-    Magnet(int pin, Vector offset);
+    Magnet(int pin, Coord offset);
 
     void enable();
     void disable();

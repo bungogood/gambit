@@ -39,7 +39,7 @@ void HBot::gotoPosition(Position position, int speed) {
     // Convert position to diagonal vector
     if (position.x < 0 || position.x > X_LIMIT) return;
     if (position.y < 0 || position.y > Y_LIMIT) return;
-    Vector diagonal = toDiagonal(position);
+    Coord diagonal = toDiagonal(position);
 
     // Calculate the delta
     move({diagonal.x - leftMotor->getPosition(),
@@ -47,7 +47,7 @@ void HBot::gotoPosition(Position position, int speed) {
          speed);
 }
 
-void HBot::move(Vector vector, int speed) {
+void HBot::move(Coord vector, int speed) {
     leftMotor->setDirection(vector.x > 0);
     rightMotor->setDirection(vector.y > 0);
 
@@ -138,9 +138,9 @@ void HBot::move(Vector vector, int speed) {
  * @brief Converts a position (mm) to a diagonal vector (steps)
  *
  * @param position
- * @return Vector
+ * @return Coord
  */
-Vector HBot::toDiagonal(Position position) {
+Coord HBot::toDiagonal(Position position) {
     double left = (double)(position.y + position.x) * STEPS_PER_MM;
     double right = (double)(position.y - position.x) * STEPS_PER_MM;
     return {(int)left, (int)right};

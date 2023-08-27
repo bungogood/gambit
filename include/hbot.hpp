@@ -10,13 +10,13 @@
 #define Y_LIMIT 500
 
 // Stored in steps
-typedef struct Vector {
+typedef struct Coord {
     int x;
     int y;
-} Vector;
+} Coord;
 
 // Stored in mm
-typedef Vector Position;
+typedef Coord Position;
 
 class HBot {
     Motor* leftMotor;
@@ -29,8 +29,8 @@ class HBot {
 
     void init();
 
-    Vector toDiagonal(Position position);
-    void move(Vector vector, int speed);
+    Coord toDiagonal(Position position);
+    void move(Coord vector, int speed);
 
     void calibrate(int speed = CALIBRATION_SPEED);
     void gotoPosition(Position position, int speed = DEFAULT_SPEED);
