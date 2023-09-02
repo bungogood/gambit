@@ -1,5 +1,16 @@
 #pragma once
 
+enum class Color : int {
+    OFF = 0,
+    RED = 1,
+    GREEN = 2,
+    YELLOW = 3,
+    BLUE = 4,
+    PURPLE = 5,
+    CYAN = 6,
+    WHITE = 7
+};
+
 class Indicator {
     bool red_state = false;
     bool green_state = false;
@@ -15,8 +26,5 @@ class Indicator {
     Indicator(int red_pin, int green_pin, int blue_pin);
     void init();
 
-    void setRed(bool state);
-    void setGreen(bool state);
-    void setBlue(bool state);
-    void set(bool red, bool green, bool blue);
+    void set(Color state);
 };

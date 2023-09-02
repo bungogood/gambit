@@ -3,7 +3,7 @@
 #include "board.hpp"
 #include "indicator.hpp"
 
-Indicator indicator(14, 15, 16);
+Indicator indicator(LED_RED, LED_GREEN, LED_BLUE);
 
 Magnet leftMagnet(9, {0, -30});
 Magnet rightMagnet(9, {0, 30});
@@ -25,14 +25,14 @@ void setup() {
     Serial.begin(9600);
     Serial.println("Starting...");
     indicator.init();
-    indicator.set(true, false, false);
+    indicator.set(Color::RED);
     board.init();
     board.calibrate();
     Serial.println("Calibrated");
-    indicator.set(false, true, false);
+    indicator.set(Color::GREEN);
     Move move = chess.parse_move("a2a4", WHITE);
     board.move(move, 500);
-    indicator.set(false, false, true);
+    indicator.set(Color::BLUE);
 }
 
 void loop() {}
