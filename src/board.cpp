@@ -3,7 +3,9 @@
 #include <Arduino.h>
 
 Board::Board(HBot* hbot, Magnet* magnet, Chess* chess)
-    : hbot(hbot), magnet(magnet), chess(chess) {}
+    : hbot(hbot), magnet(magnet), chess(chess) {
+    init();
+}
 
 void Board::init() { hbot->init(); }
 

@@ -5,7 +5,9 @@
 #include "motor.hpp"
 
 HBot::HBot(Motor* leftMotor, Motor* rightMotor, int switchPin)
-    : leftMotor(leftMotor), rightMotor(rightMotor), switchPin(switchPin) {}
+    : leftMotor(leftMotor), rightMotor(rightMotor), switchPin(switchPin) {
+    init();
+}
 
 void HBot::init() {
     leftMotor->init();

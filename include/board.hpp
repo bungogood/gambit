@@ -20,7 +20,6 @@ class Board {
 
    public:
     Board(HBot* hbot, Magnet* magnet, Chess* chess);
-
     void init();
 
     void calibrate(int speed = CALIBRATION_SPEED);

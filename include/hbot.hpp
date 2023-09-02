@@ -26,7 +26,6 @@ class HBot {
 
    public:
     HBot(Motor* leftMotor, Motor* rightMotor, int switchPin);
-
     void init();
 
     Coord toDiagonal(Position position);

@@ -10,6 +10,7 @@ class Magnet {
     const Coord offset;
 
     Magnet(int pin, Coord offset);
+    void init();
 
     void enable();
     void disable();
