@@ -68,7 +68,7 @@ class Chess {
     unsigned long long get_black();
     int get_piece_on_square(int square);
     void print_board();
-    Move parse_move(char *move_string, int side, int en_passant = 128);
+    Move parse_move(const char *move_string, int side, int en_passant = 128);
     int search_position(int side, int en_passant, int alpha, int beta,
                         int depth, Search_Info *search_info);
     int quiescence_search(int side, int en_passant, int alpha, int beta);

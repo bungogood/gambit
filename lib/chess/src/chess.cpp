@@ -490,7 +490,7 @@ int Chess::search_position(int side, int en_passant, int alpha, int beta,
 ;---------------------------------------------------------------------------------;
 \*********************************************************************************/
 
-Move Chess::parse_move(char *move_string, int side, int en_passant) {
+Move Chess::parse_move(const char *move_string, int side, int en_passant) {
     Move_List move_list[1];
     Move move;
     generate_moves(side, en_passant, move_list, 0);
