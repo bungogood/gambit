@@ -141,7 +141,7 @@ State update_state(Chess *chess, int instruction, int side, State state,
                             state_memory->length++;
                             return State::FriendlyAndEnemyPU;
                         }
-                        chess->make_move(side, current_square_moves->moves[i]);
+                        chess->make_move(current_square_moves->moves[i], side);
                         printf("MOVE COMMITTED \n");
                         return State::MoveComplete;
                     }
@@ -192,7 +192,7 @@ State update_state(Chess *chess, int instruction, int side, State state,
                             prev_enemy_square &&
                         current_square_moves->moves[i].source_square ==
                             prev_friendly_square) {
-                        chess->make_move(side, current_square_moves->moves[i]);
+                        chess->make_move(current_square_moves->moves[i], side);
                         printf("MOVE COMMITTED \n");
                         return State::MoveComplete;
                     }

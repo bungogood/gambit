@@ -75,6 +75,6 @@ class Chess {
     int generate_moves(int side, int en_passant, Move_List *move_list,
                        bool only_captures);
     inline int evaluate_position(int side);
-    void unmake_move(int side, Move move);
-    void make_move(int side, Move move);
+    void unmake_move(Move move, int side);
+    void make_move(Move move, int side);
 };

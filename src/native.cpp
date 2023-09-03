@@ -3,7 +3,7 @@
 
 #include "chess.hpp"
 
-int main() {
+void play() {
     Chess chess;
     Search_Info search_info[1];
 
@@ -19,7 +19,7 @@ int main() {
     printf("\nenter search depth\n( 2 - 6 recommended)\n");
 
     char move_string[6];
-    int side = 8, en_passant_square = 128, depth = getchar() - '0';
+    int side = WHITE, en_passant_square = 128, depth = getchar() - '0';
 
     printf("\nEnter move in format:\n\n");
     printf(" e2e4 - common move\n");
@@ -34,8 +34,8 @@ int main() {
         if (!fgets(move_string, 6, stdin)) continue;
         if (move_string[0] == '\n') continue;
 
-        Move move = chess.parse_move(side, en_passant_square,
-                                     move_string);  // parse move
+        Move move = chess.parse_move(move_string, side,
+                                     en_passant_square);  // parse move
 
         if (!move.source_square && !move.target_square &&
             !move.promoted_piece) {
@@ -43,7 +43,7 @@ int main() {
             continue;
         }
 
-        chess.make_move(side, move);
+        chess.make_move(move, side);
         side = 24 - side;
         en_passant_square = move.skip_square;  // make move, update side/e.p.
         chess.print_board();                   // print board
@@ -54,7 +54,7 @@ int main() {
         printf("\nScore: %d\n\n", score);
 
         if (score == 10000 || score == -10000) {  // mate
-            chess.make_move(side, search_info->best_move);
+            chess.make_move(search_info->best_move, side);
             side = 24 - side;
             en_passant_square = search_info->best_move.skip_square;
             chess.print_board();
@@ -63,12 +63,15 @@ int main() {
             break;
         }
 
-        chess.make_move(side, search_info->best_move);
+        chess.make_move(search_info->best_move, side);
         side = 24 - side;
         en_passant_square =
             search_info->best_move.skip_square;  // make engine's move
         chess.print_board();                     // print board
     }
+}
 
+int main() {
+    play();
     return 0;
 }

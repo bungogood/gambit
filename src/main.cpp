@@ -19,7 +19,7 @@ HBot hbot(&leftMotor, &rightMotor, 8);
 
 Chess chess;
 
-Board board(&hbot, &magnet);
+Board board(&hbot, &upMagnet);
 
 void setup() {
     Serial.begin(9600);
@@ -29,8 +29,11 @@ void setup() {
     board.calibrate();
     Serial.println("Calibrated");
     indicator.set(Color::GREEN);
+    board.move({SQB1}, 500);
+    delay(1000);
     Move move = chess.parse_move("b1c3", WHITE);
     board.move(move, 500);
+    chess.make_move(move, WHITE);
     indicator.set(Color::BLUE);
 }
 

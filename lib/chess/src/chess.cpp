@@ -266,7 +266,7 @@ int Chess::get_piece_on_square(int square) { return board_array[square]; }
 ;---------------------------------------------------------------------------------;
 \*********************************************************************************/
 
-inline void Chess::make_move(int side, Move move) {
+inline void Chess::make_move(Move move, int side) {
     board_array[move.rook_square] = board_array[move.captured_square] =
         board_array[move.source_square] = 0;
     board_array[move.target_square] = move.piece & 31;
@@ -279,7 +279,7 @@ inline void Chess::make_move(int side, Move move) {
     }
 }
 
-inline void Chess::unmake_move(int side, Move move) {
+inline void Chess::unmake_move(Move move, int side) {
     board_array[move.rook_square] = side + 38;
     board_array[move.skip_square] = board_array[move.target_square] = 0;
     board_array[move.source_square] = move.piece;
@@ -340,7 +340,7 @@ int Chess::generate_moves(int side, int en_passant, Move_List *move_list,
                         break;
                     if ((move.capture & 7) == 3) return move_list->length = 0;
 
-                    make_move(side, move);  // make move
+                    make_move(move, side);  // make move
 
                     if (move.piece_type < 3) {
                         if (move.target_square + move.step_vector_ray + 1 &
@@ -370,7 +370,7 @@ int Chess::generate_moves(int side, int en_passant, Move_List *move_list,
                                7 &&
                            board_array[move.target_square] & 4);
 
-                    unmake_move(side, move);  // take back
+                    unmake_move(move, side);  // take back
 
                     move.capture += move.piece_type < 5;
 
@@ -428,11 +428,11 @@ int Chess::quiescence_search(int side, int en_passant, int alpha,
             }
         }
 
-        make_move(side, move_list->moves[i]);  // make move
+        make_move(move_list->moves[i], side);  // make move
         int score =
             -quiescence_search(24 - side, move_list->moves[i].skip_square,
                                -beta, -alpha);   // recursive quiescence call
-        unmake_move(side, move_list->moves[i]);  // take back
+        unmake_move(move_list->moves[i], side);  // take back
 
         if (score >= beta) return beta;
         if (score > alpha) {
@@ -464,11 +464,11 @@ int Chess::search_position(int side, int en_passant, int alpha, int beta,
             }
         }
 
-        make_move(side, move_list->moves[i]);  // make move
+        make_move(move_list->moves[i], side);  // make move
         int score = -search_position(24 - side, move_list->moves[i].skip_square,
                                      -beta, -alpha, depth - 1,
                                      search_info);  // recursive search call
-        unmake_move(side, move_list->moves[i]);     // take back
+        unmake_move(move_list->moves[i], side);     // take back
 
         search_info->best_move = move_list->moves[i];  // store best move so far
 

@@ -24,10 +24,10 @@ int search_perf(int side, int en_passant, Chess* chess, int depth) {
     if (!chess->generate_moves(side, en_passant, &possible, 0)) return 1;
 
     for (int i = 0; i < possible.length; i++) {     // loop over move list
-        chess->make_move(side, possible.moves[i]);  // make move
+        chess->make_move(possible.moves[i], side);  // make move
         count += search_perf(24 - side, possible.moves[i].skip_square, chess,
                              depth - 1);
-        chess->unmake_move(side, possible.moves[i]);  // take back
+        chess->unmake_move(possible.moves[i], side);  // take back
     }
 
     return count;
