@@ -40,7 +40,7 @@ std::vector<MoveStep> knightShuffle(Move move) {
     if (abs(tx - sx) > abs(ty - sy)) {
         int halfSquare = (sy + 1) * 2 + ty - sy;
         // move along y
-        steps.push_back(MoveStep(BPoint((ty + 1) * 2, halfSquare), true));
+        steps.push_back(MoveStep(BPoint((sx + 1) * 2, halfSquare), true));
         // move along x
         steps.push_back(MoveStep(BPoint((tx + 1) * 2, halfSquare), true));
     } else {
