@@ -14,4 +14,6 @@ class Magnet {
 
     void enable();
     void disable();
+
+    bool isOn() { return enabled; }
 };
