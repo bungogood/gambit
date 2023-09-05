@@ -77,22 +77,24 @@ std::vector<MoveStep> captureSteps(Move move) {
 
     if (move.capture) {
         steps.push_back(MoveStep(move.captured_square, false));
-        if (move.capture & 8) {
+        if (move.capture & WHITE) {
             // capturing white
             int halfSquare = (cy + 1) * 2 + 1;
-            steps.push_back(MoveStep(BPoint(cx, halfSquare), true));
+            steps.push_back(MoveStep(BPoint((cx + 1) * 2, halfSquare), true));
             steps.push_back(MoveStep(BPoint(WHITE_SLIDE, halfSquare), true));
-            steps.push_back(MoveStep(BPoint(WHITE_SLIDE, WHITE_CAPTURE), true));
             steps.push_back(
-                MoveStep(BPoint(WHITE_CAPTURE, WHITE_CAPTURE), true));
+                MoveStep(BPoint(WHITE_SLIDE, WHITE_CAPTURE_Y), true));
+            steps.push_back(
+                MoveStep(BPoint(WHITE_CAPTURE_X, WHITE_CAPTURE_Y), true));
         } else {
             // capturing black
             int halfSquare = (cy + 1) * 2 - 1;
-            steps.push_back(MoveStep(BPoint(cx, halfSquare), true));
+            steps.push_back(MoveStep(BPoint((cx + 1) * 2, halfSquare), true));
             steps.push_back(MoveStep(BPoint(BLACK_SLIDE, halfSquare), true));
-            steps.push_back(MoveStep(BPoint(BLACK_SLIDE, BLACK_CAPTURE), true));
             steps.push_back(
-                MoveStep(BPoint(BLACK_CAPTURE, BLACK_CAPTURE), true));
+                MoveStep(BPoint(BLACK_SLIDE, BLACK_CAPTURE_Y), true));
+            steps.push_back(
+                MoveStep(BPoint(BLACK_CAPTURE_X, BLACK_CAPTURE_Y), true));
         }
     }
     return steps;
