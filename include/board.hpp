@@ -11,6 +11,7 @@
 #define OFFSET_RANK 7   // 1-8
 
 class Board {
+   private:
     HBot* hbot;
     Magnet* magnet;
 
@@ -21,6 +22,6 @@ class Board {
     void init();
 
     void calibrate(int speed = CALIBRATION_SPEED);
-    void move(Move move, int speed = DEFAULT_SPEED);
+    void move(std::vector<MoveStep> steps, int speed = DEFAULT_SPEED);
     void gotoSquare(Square square, int speed = DEFAULT_SPEED);
 };

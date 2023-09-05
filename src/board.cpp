@@ -16,8 +16,7 @@ void Board::gotoSquare(Square square, int speed) {
     hbot->gotoPosition(position, speed);
 }
 
-void Board::move(Move move, int speed) {
-    std::vector<MoveStep> steps = moveSteps(move);
+void Board::move(std::vector<MoveStep> steps, int speed) {
     runSteps(steps, speed);
 }
 
