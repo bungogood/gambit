@@ -3,16 +3,14 @@
 #include <string>
 
 #include "board.hpp"
-#include "indicator.hpp"
+#include "controller.hpp"
 
 Indicator indicator(LED_RED, LED_GREEN, LED_BLUE);
 
 Magnet leftMagnet(9, {0, -30});
 Magnet rightMagnet(9, {0, 30});
-Magnet upMagnet(9, {23, 0});
+Magnet upMagnet(9, {20, 0});  // 23
 Magnet downMagnet(9, {-33, 0});
-
-Magnet magnet(9, {0, 0});
 
 Motor leftMotor(2, 3, 4, 200);
 Motor rightMotor(5, 6, 7, 200);
@@ -23,23 +21,35 @@ Chess chess;
 
 Board board(&hbot, &upMagnet);
 
+Controller controller(&board, &chess, &indicator);
+
 // clang-format off
 std::vector<std::string> game = {
     "e2e4", "c7c6",
-    "d2d4", "d7d5", 
-    // "b1c3", "d5d4"
+    "d2d4", "d7d5",
+    "b1c3", "d5e4",
+    "c3e4", "b8d7",
+    "e4g5", "g8f6",
+    "f1d3", "e7e6",
+    "g1f3", "h7h6",
+    "g5e6", "d8e7",
+    "e1g1", "f7e6",
+    "d3g6", "e8d8",
+    "c1f4", "b7b5",
+    "a2a4", "c8b7",
+    "f1e1", "f6d5",
+    "f4g3", "d8c8",
+    "a4b5", "c6b5",
+    "d1d3", "b7c6",
+    "g6f5", "e6f5",
+    "e1e7", "f8e7",
+    "c2c4"
 };
 // clang-format on
 
 void replay() {
-    int side = WHITE;
     for (std::string move : game) {
-        indicator.set(Color::GREEN);
-        Move parsed_move = chess.parse_move(move.c_str(), side);
-        board.move(parsed_move, 500);
-        chess.make_move(parsed_move, side);
-        side = side == WHITE ? BLACK : WHITE;
-        indicator.set(Color::BLUE);
+        controller.makeMove(move, 500);
         delay(1000);
     }
 }
@@ -47,13 +57,12 @@ void replay() {
 void setup() {
     Serial.begin(9600);
     Serial.println("Starting...");
-    indicator.set(Color::RED);
-    board.init();
-    board.calibrate();
+    controller.init();
     Serial.println("Calibrated");
     // Move move = {SQD2, SQE3, WPAWN | WHITE, WPAWN, BPAWN | BLACK, SQE3};
+    // Move move = {SQC3, SQE4, KNIGHT | WHITE, KNIGHT};
     // Move move = chess.parse_move("a2a4", WHITE);
-    // board.move(move, 600);
+    // controller.makeMove(move, 500);
     replay();
 }
 
