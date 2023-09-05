@@ -1,4 +1,4 @@
-#include "translator.hpp"
+#include "bridge.hpp"
 
 #include <cmath>
 
@@ -6,6 +6,35 @@ MoveStep::MoveStep(BPoint point, bool magnet) : point(point), magnet(magnet) {}
 MoveStep::MoveStep(Square square, bool magnet)
     : point(BPoint((1 + square % 16) * 2, (8 - square / 16) * 2)),
       magnet(magnet) {}
+
+/**
+ * @brief Move steps for move
+ *
+ * @param move Move
+ * @return Steps to move
+ */
+std::vector<MoveStep> moveSteps(Move move, Chess* chess) {
+    std::vector<MoveStep> steps;
+
+    if (move.capture) {  // capture
+        std::vector<MoveStep> shuffle = captureSteps(move);
+        steps.insert(steps.end(), shuffle.begin(), shuffle.end());
+    }
+
+    steps.push_back(MoveStep(move.source_square, false));
+    if (move.piece_type == KNIGHT) {  // knight move
+        std::vector<MoveStep> shuffle = knightShuffle(move);
+        steps.insert(steps.end(), shuffle.begin(), shuffle.end());
+    }
+    steps.push_back(MoveStep(move.target_square, true));
+
+    if (!(move.rook_square & 0x88)) {
+        std::vector<MoveStep> castling = castlingSteps(move);
+        steps.insert(steps.end(), castling.begin(), castling.end());
+    }
+
+    return steps;
+}
 
 /**
  * @brief Castling steps for rook
@@ -97,28 +126,5 @@ std::vector<MoveStep> captureSteps(Move move) {
                 MoveStep(BPoint(BLACK_CAPTURE_X, BLACK_CAPTURE_Y), true));
         }
     }
-    return steps;
-}
-
-std::vector<MoveStep> moveSteps(Move move) {
-    std::vector<MoveStep> steps;
-
-    if (move.capture) {  // capture
-        std::vector<MoveStep> shuffle = captureSteps(move);
-        steps.insert(steps.end(), shuffle.begin(), shuffle.end());
-    }
-
-    steps.push_back(MoveStep(move.source_square, false));
-    if (move.piece_type == KNIGHT) {  // knight move
-        std::vector<MoveStep> shuffle = knightShuffle(move);
-        steps.insert(steps.end(), shuffle.begin(), shuffle.end());
-    }
-    steps.push_back(MoveStep(move.target_square, true));
-
-    if (!(move.rook_square & 0x88)) {
-        std::vector<MoveStep> castling = castlingSteps(move);
-        steps.insert(steps.end(), castling.begin(), castling.end());
-    }
-
     return steps;
 }

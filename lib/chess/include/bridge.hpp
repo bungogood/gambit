@@ -30,4 +30,4 @@ class MoveStep {
 std::vector<MoveStep> castlingSteps(Move move);
 std::vector<MoveStep> knightShuffle(Move move);
 std::vector<MoveStep> captureSteps(Move move);
-std::vector<MoveStep> moveSteps(Move move);
+std::vector<MoveStep> moveSteps(Move move, Chess* chess);

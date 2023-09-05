@@ -2,9 +2,9 @@
 
 #include <vector>
 
+#include "bridge.hpp"
 #include "hbot.hpp"
 #include "magnet.hpp"
-#include "translator.hpp"
 
 #define SQUARE_SIZE 50
 #define OFFSET_FILE 20  // A-H
