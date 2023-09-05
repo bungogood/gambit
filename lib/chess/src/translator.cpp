@@ -8,20 +8,31 @@ MoveStep::MoveStep(Square square, bool magnet)
       magnet(magnet) {}
 
 /**
- * @brief Castling steps
+ * @brief Castling steps for rook
  *
  * @param move Castling move
- * @return Steps to castle
+ * @return Steps to castle rook
  */
 std::vector<MoveStep> castlingSteps(Move move) {
     std::vector<MoveStep> steps;
     int sx = move.source_square % 16;
-    int sy = 7 - move.source_square / 16;
     int tx = move.target_square % 16;
-    int ty = 7 - move.target_square / 16;
-
     int rx = move.rook_square % 16;
-    int ry = 7 - move.rook_square / 16;
+    int dx = (sx + tx) / 2;
+
+    int y = 7 - move.source_square / 16;
+
+    // TODO: reverse after magnet switch
+    int halfSquare = (y + 1) * 2 + (move.piece & WHITE ? 1 : -1);
+
+    // move to rook
+    steps.push_back(MoveStep(move.rook_square, false));
+    // move up
+    steps.push_back(MoveStep(BPoint((rx + 1) * 2, halfSquare), true));
+    // move across
+    steps.push_back(MoveStep(BPoint((dx + 1) * 2, halfSquare), true));
+    // move down
+    steps.push_back(MoveStep(BPoint((dx + 1) * 2, (y + 1) * 2), true));
 }
 
 /**
@@ -90,8 +101,6 @@ std::vector<MoveStep> captureSteps(Move move) {
 std::vector<MoveStep> moveSteps(Move move) {
     std::vector<MoveStep> steps;
 
-    if (!(move.rook_square & 0x88)) return castlingSteps(move);
-
     if (move.capture) {  // capture
         std::vector<MoveStep> shuffle = captureSteps(move);
         steps.insert(steps.end(), shuffle.begin(), shuffle.end());
@@ -103,6 +112,11 @@ std::vector<MoveStep> moveSteps(Move move) {
         steps.insert(steps.end(), shuffle.begin(), shuffle.end());
     }
     steps.push_back(MoveStep(move.target_square, true));
+
+    if (!(move.rook_square & 0x88)) {
+        std::vector<MoveStep> castling = castlingSteps(move);
+        steps.insert(steps.end(), castling.begin(), castling.end());
+    }
 
     return steps;
 }
