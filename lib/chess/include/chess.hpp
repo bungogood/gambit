@@ -1,6 +1,7 @@
 #pragma once
 
 typedef int Square;
+typedef int Player;
 
 const int WHITE = 8;
 const int BLACK = 16;
@@ -51,6 +52,7 @@ typedef struct {
 } Search_Info;
 
 class Chess {
+   private:
     int board_array[129] = {  // 0x88 board + centers positional scores
         54, 20, 21, 23, 51, 21, 20, 54, 0, 0,  5,  0,  -5, 0,  5,  0,
         18, 18, 18, 18, 18, 18, 18, 18, 5, 5,  0,  0,  0,  0,  5,  5,
@@ -60,6 +62,8 @@ class Chess {
         0,  0,  0,  0,  0,  0,  0,  0,  5, 10, 15, 20, 20, 15, 10, 5,
         9,  9,  9,  9,  9,  9,  9,  9,  5, 5,  0,  0,  0,  0,  5,  5,
         46, 12, 13, 15, 43, 13, 12, 46, 0, 0,  5,  0,  -5, 0,  5,  0};
+    Square en_passant;
+    Player side;
 
    public:
     Chess();
@@ -68,13 +72,15 @@ class Chess {
     unsigned long long get_black();
     int get_piece_on_square(int square);
     void print_board();
-    Move parse_move(const char *move_string, int side, int en_passant = 128);
-    int search_position(int side, int en_passant, int alpha, int beta,
-                        int depth, Search_Info *search_info);
-    int quiescence_search(int side, int en_passant, int alpha, int beta);
-    int generate_moves(int side, int en_passant, Move_List *move_list,
-                       bool only_captures);
-    inline int evaluate_position(int side);
-    void unmake_move(Move move, int side);
-    void make_move(Move move, int side);
+    Move parse_move(const char *move_string);
+    int search_position(Player side, int alpha, int beta, int depth,
+                        Search_Info *search_info);
+    int quiescence_search(Player side, int alpha, int beta);
+    int generate_moves(Move_List *move_list, bool only_captures = false);
+    inline int evaluate_position(Player side);
+    void unmake_move(Move move, Square old_ep);
+    void make_move(Move move);
+
+    Player get_side() { return side; }
+    Square get_en_passant() { return en_passant; }
 };
