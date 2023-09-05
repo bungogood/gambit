@@ -32,6 +32,19 @@ void HBot::calibrate(int speed) {
 }
 
 /**
+ * @brief Checks if a position is in bounds
+ *
+ * @param position
+ * @return if position is possible
+ */
+bool HBot::inBounds(Position position) {
+    // clang-format off
+    return position.x >= 0 && position.x <= X_LIMIT && 
+           position.y >= 0 && position.y <= Y_LIMIT;
+    // clang-format on
+}
+
+/**
  * @brief Moves HBot to a position (mm)
  *
  * @param position destination position
@@ -39,8 +52,7 @@ void HBot::calibrate(int speed) {
  */
 void HBot::gotoPosition(Position position, int speed) {
     // Convert position to diagonal vector
-    if (position.x < 0 || position.x > X_LIMIT) return;
-    if (position.y < 0 || position.y > Y_LIMIT) return;
+    if (!inBounds(position)) return;
     Coord diagonal = toDiagonal(position);
 
     // Calculate the delta

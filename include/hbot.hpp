@@ -28,6 +28,8 @@ class HBot {
     HBot(Motor* leftMotor, Motor* rightMotor, int switchPin);
     void init();
 
+    bool inBounds(Position position);
+
     Coord toDiagonal(Position position);
     void move(Coord vector, int speed);
 
