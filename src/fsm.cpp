@@ -1,4 +1,4 @@
-#include "state_machine.hpp"
+#include "fsm.hpp"
 
 #include <stdio.h>
 #include <string.h>
@@ -64,9 +64,9 @@ void get_attacks_on_square(Move_List *move_list,
            current_square_moves->length);
 }
 
-bool is_friendly(Chess *chess, int side, int square) {
+bool is_friendly(Chess *chess, int square) {
     int piece = chess->get_piece_on_square(square);
-    if (side == 8) {
+    if (chess->get_side() == WHITE) {
         if (piece > 0 && piece < 18 || piece == 43 || piece == 46) {
             return true;
         } else
@@ -85,7 +85,7 @@ bool is_friendly(Chess *chess, int side, int square) {
 ;---------------------------------------------------------------------------------;
 \*********************************************************************************/
 
-State update_state(Chess *chess, int instruction, int side, State state,
+State update_state(Chess *chess, int instruction, State state,
                    State_Memory *state_memory, Move_List *move_list,
                    Move_List *current_square_moves) {
     // chess.print_board();
@@ -94,12 +94,12 @@ State update_state(Chess *chess, int instruction, int side, State state,
     unsigned long long friendlies;
     unsigned long long enemies;
 
-    if (side == 16) {  // black turn
-        friendlies = chess->get_black();
-        enemies = chess->get_white();
-    } else {  // white turn
+    if (chess->get_side() == WHITE) {  // white turn
         friendlies = chess->get_white();
         enemies = chess->get_black();
+    } else {  // black turn
+        friendlies = chess->get_black();
+        enemies = chess->get_white();
     }
 
     switch (state) {
@@ -141,7 +141,7 @@ State update_state(Chess *chess, int instruction, int side, State state,
                             state_memory->length++;
                             return State::FriendlyAndEnemyPU;
                         }
-                        chess->make_move(current_square_moves->moves[i], side);
+                        chess->make_move(current_square_moves->moves[i]);
                         printf("MOVE COMMITTED \n");
                         return State::MoveComplete;
                     }
@@ -173,7 +173,7 @@ State update_state(Chess *chess, int instruction, int side, State state,
         case FriendlyAndEnemyPU:
             int prev_friendly_square;
             int prev_enemy_square;
-            if (is_friendly(chess, side, state_memory->memory[0])) {
+            if (is_friendly(chess, state_memory->memory[0])) {
                 prev_friendly_square = state_memory->memory[0];
                 prev_enemy_square = state_memory->memory[1];
             } else {
@@ -192,7 +192,7 @@ State update_state(Chess *chess, int instruction, int side, State state,
                             prev_enemy_square &&
                         current_square_moves->moves[i].source_square ==
                             prev_friendly_square) {
-                        chess->make_move(current_square_moves->moves[i], side);
+                        chess->make_move(current_square_moves->moves[i]);
                         printf("MOVE COMMITTED \n");
                         return State::MoveComplete;
                     }
@@ -207,11 +207,11 @@ State update_state(Chess *chess, int instruction, int side, State state,
                 state_memory->length--;
                 return State::Idle;
             } else if (state_memory->length == 2 &&
-                       is_friendly(chess, side, instruction)) {
+                       is_friendly(chess, instruction)) {
                 state_memory->length--;
                 return State::FriendlyPU;
             } else if (state_memory->length == 2 &&
-                       !is_friendly(chess, side, instruction)) {
+                       !is_friendly(chess, instruction)) {
                 state_memory->length--;
                 return State::EnemyPU;
             } else {
