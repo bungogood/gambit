@@ -1,4 +1,4 @@
-name: Build
+name: Build and Lint
 
 on: [push]
 
@@ -7,19 +7,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/cache@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cache/pip
             ~/.platformio/.cache
           key: ${{ runner.os }}-pio
-      - uses: actions/setup-python@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
           python-version: "3.9"
+
       - name: Install PlatformIO
         run: pip install --upgrade platformio
+
+      - name: Lint
+        uses: jidicula/clang-format-action@v4.13.0
+
       - name: Build
         run: pio run
+
       - name: Test native
         run: pio test -e native
