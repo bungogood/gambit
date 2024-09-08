@@ -2,11 +2,7 @@
 
 #include <Arduino.h>
 
-Board::Board(HBot* hbot, Magnet* magnet) : hbot(hbot), magnet(magnet) {
-    init();
-}
-
-void Board::init() { hbot->init(); }
+Board::Board(HBot* hbot, Magnet* magnet) : hbot(hbot), magnet(magnet) {}
 
 void Board::calibrate(int speed) { hbot->calibrate(speed); }
 
@@ -35,4 +31,5 @@ void Board::runSteps(std::vector<MoveStep> steps, int speed) {
         delay(200);
         hbot->gotoPosition(position, speed);
     }
+    magnet->disable();
 }

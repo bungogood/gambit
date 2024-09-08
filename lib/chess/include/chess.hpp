@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 typedef int Square;
 typedef int Player;
 
@@ -67,9 +69,9 @@ class Chess {
 
    public:
     Chess();
-    unsigned long long get_occupied();
-    unsigned long long get_white();
-    unsigned long long get_black();
+    uint64_t get_occupied();
+    uint64_t get_white();
+    uint64_t get_black();
     int get_piece_on_square(int square);
     void print_board();
     Move parse_move(const char *move_string);
@@ -80,6 +82,10 @@ class Chess {
     inline int evaluate_position(Player side);
     void unmake_move(Move move, Square old_ep);
     void make_move(Move move);
+
+    char square_char(int square);
+    std::string get_fen();
+    // void set_fen(std::string fen);
 
     Player get_side() { return side; }
     Square get_en_passant() { return en_passant; }

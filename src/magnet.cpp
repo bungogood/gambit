@@ -2,9 +2,7 @@
 
 #include <Arduino.h>
 
-Magnet::Magnet(int pin, Coord offset) : pin(pin), offset(offset) { init(); }
-
-void Magnet::init() {
+Magnet::Magnet(int pin, Coord offset) : pin(pin), offset(offset) {
     pinMode(pin, OUTPUT);
     disable();
 }

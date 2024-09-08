@@ -1,22 +1,28 @@
-
 #include "controller.hpp"
 
-Controller::Controller(Board* board, Chess* chess, Indicator* indicator)
-    : board(board), chess(chess), indicator(indicator) {}
+Controller::Controller(Board* board, Chess* chess, Indicator* indicator,
+                       BluetoothManager* bluetooth)
+    : board(board), chess(chess), indicator(indicator), bluetooth(bluetooth) {}
 
 void Controller::init() {
-    indicator->init();
     indicator->set(Color::RED);
-    board->init();
-    board->calibrate();
+    bluetooth->begin("Gambit");
+    bluetooth->setFEN(chess->get_fen());
+}
+
+void Controller::calibrate(int speed) {
+    indicator->set(Color::BLUE);
+    board->calibrate(speed);
     indicator->set(Color::GREEN);
 }
 
 void Controller::makeMove(Move move, int speed) {
     std::vector<MoveStep> steps = moveSteps(move, chess);
     indicator->set(Color::BLUE);
-    board->move(steps, speed);
     chess->make_move(move);
+    bluetooth->setFEN(chess->get_fen());
+    board->move(steps, speed);
+    // should do comparision between chess and matrix
     indicator->set(Color::GREEN);
 }
 

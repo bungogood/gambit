@@ -19,7 +19,6 @@ class Board {
 
    public:
     Board(HBot* hbot, Magnet* magnet);
-    void init();
 
     void calibrate(int speed = CALIBRATION_SPEED);
     void move(std::vector<MoveStep> steps, int speed = DEFAULT_SPEED);

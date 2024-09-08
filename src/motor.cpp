@@ -7,14 +7,16 @@ Motor::Motor(int enablePin, int dirPin, int stepPin, int stepsPerRevolution)
       dirPin(dirPin),
       stepPin(stepPin),
       stepsPerRevolution(stepsPerRevolution) {
-    init();
-}
-
-void Motor::init() {
     pinMode(enablePin, OUTPUT);
     pinMode(dirPin, OUTPUT);
     pinMode(stepPin, OUTPUT);
     reset();
+}
+
+void Motor::reset() {
+    position = 0;
+    disable();
+    setDirection(CW);
 }
 
 void Motor::enable() {

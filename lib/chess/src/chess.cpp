@@ -208,11 +208,11 @@ Chess::Chess() : side(WHITE), en_passant(128) {
 ;---------------------------------------------------------------------------------;
 \*********************************************************************************/
 
-unsigned long long Chess::get_occupied() {
-    unsigned long long output = 0;
+uint64_t Chess::get_occupied() {
+    uint64_t output = 0;
     int offset = 0;  // to skip over the unwanted parts of board_array
     for (int i = 0; i < 64; i++) {
-        unsigned long long temp = 0;
+        uint64_t temp = 0;
         if (i != 0 && i % 8 == 0) {
             offset += 8;
         }
@@ -224,11 +224,11 @@ unsigned long long Chess::get_occupied() {
     return output;
 }
 
-unsigned long long Chess::get_white() {
-    unsigned long long output = 0;
+uint64_t Chess::get_white() {
+    uint64_t output = 0;
     int offset = 0;
     for (int i = 0; i < 64; i++) {
-        unsigned long long temp = 0;
+        uint64_t temp = 0;
         if (i != 0 && i % 8 == 0) {
             offset += 8;
         }
@@ -241,11 +241,11 @@ unsigned long long Chess::get_white() {
     return output;
 }
 
-unsigned long long Chess::get_black() {
-    unsigned long long output = 0;
+uint64_t Chess::get_black() {
+    uint64_t output = 0;
     int offset = 0;
     for (int i = 0; i < 64; i++) {
-        unsigned long long temp = 0;
+        uint64_t temp = 0;
         if (i != 0 && i % 8 == 0) {
             offset += 8;
         }
@@ -256,6 +256,13 @@ unsigned long long Chess::get_black() {
         }
     }
     return output;
+}
+
+char Chess::square_char(int square) {
+    // do in 0-63
+    int index = square / 8 * 16 + square % 8;
+    int piece = board_array[index];
+    return promoted_pieces_string[piece & 15];
 }
 
 int Chess::get_piece_on_square(int square) { return board_array[square]; }
@@ -528,4 +535,36 @@ void Chess::print_board() {
     }
 
     printf("\n     a b c d e f g h\n\nYour move: ");
+}
+
+// TODO: Castling rights, en passant, etc.
+std::string Chess::get_fen() {
+    std::string fen = "";
+    int empty_count = 0;
+
+    for (int i = 0; i < 63; i++) {
+        char piece = square_char(i);
+        if (piece == '.') {
+            empty_count++;
+        } else {
+            if (empty_count) {
+                fen += empty_count + '0';
+                empty_count = 0;
+            }
+            fen += piece;
+        }
+
+        if ((i + 1) % 8 == 0) {
+            if (empty_count) {
+                fen += empty_count + '0';
+                empty_count = 0;
+            }
+
+            if (i != 63) fen += '/';
+        }
+    }
+
+    fen += side == WHITE ? " w" : " b";
+    // Append castling rights, en passant, etc.
+    return fen;
 }

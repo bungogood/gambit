@@ -16,13 +16,7 @@ class Motor {
     const int stepsPerRevolution;
 
     Motor(int enablePin, int dirPin, int stepPin, int stepsPerRevolution);
-    void init();
-
-    void reset() {
-        position = 0;
-        disable();
-        setDirection(CW);
-    }
+    void reset();
 
     void enable();
     void disable();
