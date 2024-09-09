@@ -2,7 +2,7 @@
 
 #include "chess.hpp"
 
-enum State {
+enum FSMState : int {
     Idle,
     FriendlyPU,
     EnemyPU,
@@ -14,6 +14,8 @@ enum State {
     Error,
     MoveComplete
 };
+
+std::string fsm_state_string(FSMState state);
 
 typedef struct {
     int memory[3];

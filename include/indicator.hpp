@@ -24,6 +24,7 @@ class Indicator {
     const int blue_pin;
 
     Indicator(int red_pin, int green_pin, int blue_pin);
+    void init();
 
     void set(Color state);
 };

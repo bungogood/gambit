@@ -4,6 +4,7 @@
 
 #include "bluetooth.hpp"
 #include "controller.hpp"
+#include "fsm.hpp"
 
 Indicator indicator(LED_RED, LED_GREEN, LED_BLUE);
 
@@ -56,13 +57,7 @@ void replay() {
     }
 }
 
-// BluetoothManager* ble;
 uint64_t reedSwitchValue;
-
-std::string currentFEN =
-    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-std::string other =
-    "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2";
 
 void setup() {
     Serial.begin(9600);
@@ -73,22 +68,23 @@ void setup() {
 
     // Serial.println("Starting...");
     controller.init();
-    // controller.calibrate();
+    controller.calibrate();
+    ble.setFSMState(FSMState::Idle);
+    // upMagnet.enable();
     // indicator.init();
     // Serial.println("Calibrated");
     // Move move = {SQD2, SQE3, WPAWN | WHITE, WPAWN, BPAWN | BLACK, SQE3};
     // Move move = {SQC3, SQE4, KNIGHT | WHITE, KNIGHT};
     // Move move = chess.parse_move("a2a4", WHITE);
     // controller.makeMove(move, 500);
+    // board.gotoSquare(SQB4);
+    // hbot.gotoPosition({250, 0});
     replay();
 }
 
 void loop() {
     ble.setReedSwitchValue(reedSwitchValue);
     reedSwitchValue++;
-    // ble.setFEN(chess.get_fen());
     ble.setFEN(chess.get_fen());
-    delay(1000);
-    ble.setFEN(other);
     delay(1000);
 }

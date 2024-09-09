@@ -16,6 +16,7 @@ class Motor {
     const int stepsPerRevolution;
 
     Motor(int enablePin, int dirPin, int stepPin, int stepsPerRevolution);
+    void init();
     void reset();
 
     void enable();

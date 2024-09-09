@@ -4,6 +4,11 @@
 
 Board::Board(HBot* hbot, Magnet* magnet) : hbot(hbot), magnet(magnet) {}
 
+void Board::init() {
+    hbot->init();
+    magnet->init();
+}
+
 void Board::calibrate(int speed) { hbot->calibrate(speed); }
 
 void Board::gotoSquare(Square square, int speed) {

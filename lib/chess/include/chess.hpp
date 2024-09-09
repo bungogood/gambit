@@ -53,6 +53,8 @@ typedef struct {
     Move best_move;
 } Search_Info;
 
+std::string square_to_string(Square square);
+
 class Chess {
    private:
     int board_array[129] = {  // 0x88 board + centers positional scores

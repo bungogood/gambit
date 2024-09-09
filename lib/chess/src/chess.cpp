@@ -542,7 +542,7 @@ std::string Chess::get_fen() {
     std::string fen = "";
     int empty_count = 0;
 
-    for (int i = 0; i < 63; i++) {
+    for (int i = 0; i < 64; i++) {
         char piece = square_char(i);
         if (piece == '.') {
             empty_count++;
@@ -564,7 +564,27 @@ std::string Chess::get_fen() {
         }
     }
 
+    // side to move
     fen += side == WHITE ? " w" : " b";
-    // Append castling rights, en passant, etc.
+
+    // castling rights
+    fen += " KQkq";
+
+    // en passant
+    fen += en_passant == 128 ? " -" : " " + square_to_string(en_passant);
+
+    // halfmove clock
+    fen += " 0";
+
+    // fullmove number
+    fen += " 1";
+
     return fen;
+}
+
+std::string square_to_string(Square square) {
+    std::string str = "";
+    str += 'a' + (square & 7);
+    str += '1' + 7 - (square >> 4);
+    return str;
 }

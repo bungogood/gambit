@@ -37,6 +37,12 @@ void BluetoothManager::begin(const char* deviceName) {
         BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY);
     stateChar->addDescriptor(new BLE2902());
 
+    moveChar = pService->createCharacteristic(
+        MOVE_CHAR_UUID, BLECharacteristic::PROPERTY_READ |
+                            BLECharacteristic::PROPERTY_WRITE |
+                            BLECharacteristic::PROPERTY_NOTIFY);
+    moveChar->addDescriptor(new BLE2902());
+
     pService->start();
 
     // BLEAdvertising* pAdvertising = BLEDevice::getAdvertising();
@@ -60,9 +66,18 @@ void BluetoothManager::setReedSwitchValue(uint64_t value) {
     }
 }
 
-void BluetoothManager::setFSMState(const std::string& state) {
+void BluetoothManager::setFSMState(const FSMState state) {
     if (stateChar != nullptr) {
-        stateChar->setValue(state.c_str());
+        std::string stateStr = fsm_state_string(state);
+        stateChar->setValue(stateStr.c_str());
         stateChar->notify();
+    }
+}
+
+void BluetoothManager::setMove(const Move move) {
+    if (moveChar != nullptr) {
+        std::string moveStr = square_to_string(move.source_square) +
+                              square_to_string(move.target_square);
+        moveChar->notify();
     }
 }

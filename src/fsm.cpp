@@ -85,9 +85,9 @@ bool is_friendly(Chess *chess, int square) {
 ;---------------------------------------------------------------------------------;
 \*********************************************************************************/
 
-State update_state(Chess *chess, int instruction, State state,
-                   State_Memory *state_memory, Move_List *move_list,
-                   Move_List *current_square_moves) {
+FSMState update_state(Chess *chess, int instruction, FSMState state,
+                      State_Memory *state_memory, Move_List *move_list,
+                      Move_List *current_square_moves) {
     // chess.print_board();
     unsigned long long square = get_bitboard_from_square(instruction);
     unsigned long long occupied = chess->get_occupied();
@@ -109,29 +109,29 @@ State update_state(Chess *chess, int instruction, State state,
                                       instruction);
                 state_memory->memory[0] = instruction;
                 state_memory->length++;
-                return State::FriendlyPU;
+                return FSMState::FriendlyPU;
             } else if ((enemies & square) != 0ULL) {
                 get_attacks_on_square(move_list, current_square_moves,
                                       instruction);
                 state_memory->memory[0] = instruction;
                 state_memory->length++;
                 if (current_square_moves->length > 0) {
-                    return State::EnemyPU;
+                    return FSMState::EnemyPU;
                 } else {
-                    return State::InvalidPiecePU;
+                    return FSMState::InvalidPiecePU;
                 }
             } else {
-                return State::Error;
+                return FSMState::Error;
             }
             break;
         case FriendlyPU:
             if (instruction == state_memory->memory[0]) {
                 state_memory->length--;
-                return State::Idle;
+                return FSMState::Idle;
             } else if ((friendlies & square) != 0ULL) {
                 state_memory->memory[1] = instruction;
                 state_memory->length++;
-                return State::InvalidPiecePU;
+                return FSMState::InvalidPiecePU;
             } else {
                 for (int i = 0; i < current_square_moves->length; i++) {
                     if (current_square_moves->moves[i].target_square ==
@@ -139,33 +139,33 @@ State update_state(Chess *chess, int instruction, State state,
                         if (current_square_moves->moves[i].capture != 0) {
                             state_memory->memory[1] = instruction;
                             state_memory->length++;
-                            return State::FriendlyAndEnemyPU;
+                            return FSMState::FriendlyAndEnemyPU;
                         }
                         chess->make_move(current_square_moves->moves[i]);
                         printf("MOVE COMMITTED \n");
-                        return State::MoveComplete;
+                        return FSMState::MoveComplete;
                     }
                 }
                 state_memory->memory[1] = instruction;
                 state_memory->length++;
-                return State::InvalidMove;
+                return FSMState::InvalidMove;
             }
             break;
         case EnemyPU:
             if (instruction == state_memory->memory[0]) {
                 state_memory->length--;
-                return State::Idle;
+                return FSMState::Idle;
             } else if ((enemies & square) != 0ULL) {
                 state_memory->memory[1] = instruction;
                 state_memory->length++;
-                return State::InvalidPiecePU;
+                return FSMState::InvalidPiecePU;
             } else {
                 for (int i = 0; i < current_square_moves->length; i++) {
                     if (current_square_moves->moves[i].source_square ==
                         instruction) {
                         state_memory->memory[1] = instruction;
                         state_memory->length++;
-                        return State::FriendlyAndEnemyPU;
+                        return FSMState::FriendlyAndEnemyPU;
                     }
                 }
             }
@@ -184,7 +184,7 @@ State update_state(Chess *chess, int instruction, State state,
             if (instruction == prev_friendly_square) {
                 state_memory->memory[0] = prev_enemy_square;
                 state_memory->length--;
-                return State::EnemyPU;
+                return FSMState::EnemyPU;
             } else if (instruction == prev_enemy_square) {
                 printf("CAPTURED!\n");
                 for (int i = 0; i < current_square_moves->length; i++) {
@@ -194,36 +194,36 @@ State update_state(Chess *chess, int instruction, State state,
                             prev_friendly_square) {
                         chess->make_move(current_square_moves->moves[i]);
                         printf("MOVE COMMITTED \n");
-                        return State::MoveComplete;
+                        return FSMState::MoveComplete;
                     }
                 }
             } else {
-                return State::Error;
+                return FSMState::Error;
             }
             break;
         case InvalidPiecePU:
             if (state_memory->length == 1 &&
                 state_memory->memory[0] == instruction) {
                 state_memory->length--;
-                return State::Idle;
+                return FSMState::Idle;
             } else if (state_memory->length == 2 &&
                        is_friendly(chess, instruction)) {
                 state_memory->length--;
-                return State::FriendlyPU;
+                return FSMState::FriendlyPU;
             } else if (state_memory->length == 2 &&
                        !is_friendly(chess, instruction)) {
                 state_memory->length--;
-                return State::EnemyPU;
+                return FSMState::EnemyPU;
             } else {
-                return State::Error;
+                return FSMState::Error;
             }
             break;
         case InvalidMove:
             if (instruction == state_memory->memory[1]) {
                 state_memory->length--;
-                return State::FriendlyPU;
+                return FSMState::FriendlyPU;
             } else {
-                return State::Error;
+                return FSMState::Error;
             }
     }
 
@@ -239,7 +239,7 @@ State update_state(Chess *chess, int instruction, State state,
 // int main() {
 //     // variable setup
 //     Chess chess;
-//     enum State state = Idle;
+//     enum FSMState state = Idle;
 //     Move_List move_list[1];
 //     Move_List current_square_moves[1];
 //     State_Memory state_memory[1];
@@ -261,13 +261,40 @@ State update_state(Chess *chess, int instruction, State state,
 //             state = update_state(&chess, square, side, state, state_memory,
 //                                  move_list, current_square_moves);
 //             printf("current state is: %d \n", state);
-//             printf("State memory 0: %d\n", state_memory->memory[0]);
-//             printf("State memory 1: %d\n", state_memory->memory[1]);
-//             if (state == State::MoveComplete) break;
+//             printf("FSMState memory 0: %d\n", state_memory->memory[0]);
+//             printf("FSMState memory 1: %d\n", state_memory->memory[1]);
+//             if (state == FSMState::MoveComplete) break;
 //         }
-//         state = State::Idle;
+//         state = FSMState::Idle;
 //         printf("move complete\n");
 //         state_memory->length = 0;
 //         side = 24 - side;
 //     }
 // }
+
+std::string fsm_state_string(FSMState state) {
+    switch (state) {
+        case FSMState::Idle:
+            return "Idle";
+        case FSMState::FriendlyPU:
+            return "FriendlyPU";
+        case FSMState::EnemyPU:
+            return "EnemyPU";
+        case FSMState::FriendlyAndEnemyPU:
+            return "FriendlyAndEnemyPU";
+        case FSMState::Castling:
+            return "Castling";
+        case FSMState::CastlingPutRookDown:
+            return "CastlingPutRookDown";
+        case FSMState::InvalidPiecePU:
+            return "InvalidPiecePU";
+        case FSMState::InvalidMove:
+            return "InvalidMove";
+        case FSMState::Error:
+            return "Error";
+        case FSMState::MoveComplete:
+            return "MoveComplete";
+        default:
+            return "Unknown";
+    }
+}

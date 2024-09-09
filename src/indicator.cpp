@@ -3,7 +3,9 @@
 #include <Arduino.h>
 
 Indicator::Indicator(int red_pin, int green_pin, int blue_pin)
-    : red_pin(red_pin), green_pin(green_pin), blue_pin(blue_pin) {
+    : red_pin(red_pin), green_pin(green_pin), blue_pin(blue_pin) {}
+
+void Indicator::init() {
     pinMode(red_pin, OUTPUT);
     pinMode(green_pin, OUTPUT);
     pinMode(blue_pin, OUTPUT);
