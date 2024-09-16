@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "chess.hpp"
+#include "fsm.hpp"
 
 // void play() {
 //     Chess chess;
@@ -72,14 +73,41 @@
 //     }
 // }
 
+#include <iostream>
+
 int main() {
-    // play();
-    printf("Hello, World!\n");
+    // variable setup
     Chess chess;
-    printf("%s\n", chess.get_fen().c_str());
-    for (int i = 0; i < 64; i++) {
-        printf("%c", chess.square_char(i));
+    enum FSMState state = Idle;
+    Move_List move_list[1];
+    Move_List current_square_moves[1];
+    State_Memory state_memory[1];
+
+    std::cout << "hello world" << std::endl;
+    std::cout << "Initial state: " << state << std::endl;
+
+    print_bitboard(chess.get_occupied());
+    std::cout << std::endl;
+    int side = 8;  // 8 = white, 16 = black
+    while (true) {
+        std::cout << "Generating moves..." << std::endl;
+        chess.generate_moves(move_list, 0);
+        chess.print_board();
+        while (true) {
+            int square;
+            std::cout << "Type number of square: " << std::endl;
+            std::cin >> square;
+            std::cout << "The square is " << square << std::endl;
+            state = update_state(&chess, square, state, state_memory,
+                                 move_list, current_square_moves);
+            std::cout << "Current state is: " << state << std::endl;
+            std::cout << "FSMState memory 0: " << state_memory->memory[0] << std::endl;
+            std::cout << "FSMState memory 1: " << state_memory->memory[1] << std::endl;
+            if (state == FSMState::MoveComplete) break;
+        }
+        state = FSMState::Idle;
+        std::cout << "Move complete" << std::endl;
+        state_memory->length = 0;
+        side = 24 - side;
     }
-    printf("\n");
-    return 0;
 }

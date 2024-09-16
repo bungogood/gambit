@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "chess.hpp"
+#include <iostream>
 
 /*********************************************************************************\
 ;---------------------------------------------------------------------------------;
@@ -14,13 +15,14 @@
 void print_bitboard(unsigned long long bitboard) {
     for (int i = 0; i < 64; i++) {
         if (i % 8 == 0) {
-            printf("\n");
+            std::cout << std::endl;
         }
         if (bitboard & 1ull << (63 - i)) {
-            printf("X ");
+            std::cout << "X ";
         } else {
-            printf(". ");
+            std::cout << ". ";
         }
+        
     }
 }
 
@@ -34,34 +36,32 @@ void get_moves_from_square(Move_List *move_list,
                            Move_List *current_square_moves, int square) {
     current_square_moves->length = 0;
     for (int i = 0; i < move_list->length; i++) {
-        // printf("SEARCHING %d\n", i);
+        // std::cout << "SEARCHING " << i << std::endl;
         if (move_list->moves[i].source_square == square) {
-            printf("FOUND\n");
-            printf("Target square: %d\n", move_list->moves[i].target_square);
+            std::cout << "FOUND" << std::endl;
+            std::cout << "Target square: " << move_list->moves[i].target_square << std::endl;
             current_square_moves->moves[current_square_moves->length] =
                 move_list->moves[i];
             current_square_moves->length++;
         }
     }
-    printf("Searching complete, found %d moves\n",
-           current_square_moves->length);
+    std::cout << "Searching complete, found " << current_square_moves->length << " moves" << std::endl;
 }
 
 void get_attacks_on_square(Move_List *move_list,
                            Move_List *current_square_moves, int square) {
     current_square_moves->length = 0;
     for (int i = 0; i < move_list->length; i++) {
-        // printf("SEARCHING %d\n", i);
+        // std::cout << "SEARCHING " << i << std::endl;
         if (move_list->moves[i].target_square == square) {
-            printf("FOUND\n");
-            printf("Source square: %d\n", move_list->moves[i].source_square);
+            std::cout << "FOUND" << std::endl;
+            std::cout << "Source square: " << move_list->moves[i].source_square << std::endl;
             current_square_moves->moves[current_square_moves->length] =
                 move_list->moves[i];
             current_square_moves->length++;
         }
     }
-    printf("Searching complete, found %d moves\n",
-           current_square_moves->length);
+    std::cout << "Searching complete, found " << current_square_moves->length << " moves" << std::endl;
 }
 
 bool is_friendly(Chess *chess, int square) {
@@ -128,6 +128,16 @@ FSMState update_state(Chess *chess, int instruction, FSMState state,
             if (instruction == state_memory->memory[0]) {
                 state_memory->length--;
                 return FSMState::Idle;
+            } else if (chess->get_piece_on_square(instruction) == 43 || chess->get_piece_on_square(instruction) == 51) { // king
+                state_memory->memory[1] = instruction;
+                state_memory->length++;
+                return FSMState::Castling;
+
+            } else if (chess->get_piece_on_square(instruction) == 46 || chess->get_piece_on_square(instruction) == 54) { // rook
+                state_memory->memory[1] = instruction;
+                state_memory->length++;
+                return FSMState::Castling;
+
             } else if ((friendlies & square) != 0ULL) {
                 state_memory->memory[1] = instruction;
                 state_memory->length++;
@@ -142,7 +152,7 @@ FSMState update_state(Chess *chess, int instruction, FSMState state,
                             return FSMState::FriendlyAndEnemyPU;
                         }
                         chess->make_move(current_square_moves->moves[i]);
-                        printf("MOVE COMMITTED \n");
+                        std::cout << "MOVE COMMITTED" << std::endl;
                         return FSMState::MoveComplete;
                     }
                 }
@@ -186,18 +196,76 @@ FSMState update_state(Chess *chess, int instruction, FSMState state,
                 state_memory->length--;
                 return FSMState::EnemyPU;
             } else if (instruction == prev_enemy_square) {
-                printf("CAPTURED!\n");
+                std::cout << "CAPTURED!" << std::endl;
                 for (int i = 0; i < current_square_moves->length; i++) {
                     if (current_square_moves->moves[i].target_square ==
                             prev_enemy_square &&
                         current_square_moves->moves[i].source_square ==
                             prev_friendly_square) {
                         chess->make_move(current_square_moves->moves[i]);
-                        printf("MOVE COMMITTED \n");
+                        std::cout << "MOVE COMMITTED" << std::endl;
                         return FSMState::MoveComplete;
                     }
                 }
             } else {
+                return FSMState::Error;
+            }
+            break;
+        case Castling:
+            if (instruction == state_memory->memory[1]) {
+                state_memory->length--;
+                return FSMState::FriendlyPU;
+            } else if (chess->get_side() == WHITE) {
+                if (instruction == 114) {
+                    state_memory->memory[1] = instruction;
+                    state_memory->memory[2] = 115;
+                    state_memory->length+=2;
+                    //chess->make_move(chess->parse_move("e1c1"));
+                    return FSMState::CastlingPutRookDown;
+                } else if (instruction == 118) {
+                    state_memory->memory[1] = instruction;
+                    state_memory->memory[2] = 117;
+                    state_memory->length+=2;
+                    //chess->make_move(chess->parse_move("e1g1"));
+                    return FSMState::CastlingPutRookDown;
+                } else {
+                    return FSMState::Error;
+                }
+            } else if (chess->get_side() == BLACK) {
+                if (instruction == 2) {
+                    state_memory->memory[1] = instruction;
+                    state_memory->memory[2] = 3;
+                    state_memory->length++;
+                    //chess->make_move(chess->parse_move("e8c8"));
+                    return FSMState::CastlingPutRookDown;
+                } else if (instruction == 6) {
+                    state_memory->memory[1] = instruction;
+                    state_memory->memory[2] = 5;
+                    state_memory->length++;
+                    //chess->make_move(chess->parse_move("e8g8"));
+                    return FSMState::CastlingPutRookDown;
+                } else {
+                    return FSMState::Error;
+                }
+            }else {
+                return FSMState::Error;
+            }
+            break;
+        case CastlingPutRookDown:
+            if (instruction == state_memory->memory[1]) {
+                state_memory->length--;
+                return FSMState::Castling;
+            } else if (instruction == state_memory->memory[2]) {
+                for (int i = 0; i < current_square_moves->length; i++) {
+                    if (current_square_moves->moves[i].target_square == state_memory->memory[1]) {
+                       // std::cout << current_square_moves->moves[i] << std::endl;
+                        chess->make_move(current_square_moves->moves[i]);
+                        std::cout << "MOVE COMMITTED" << std::endl;
+                        return FSMState::MoveComplete;
+                    }
+                }
+                return FSMState::Error;
+            }else {
                 return FSMState::Error;
             }
             break;
