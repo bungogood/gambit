@@ -144,8 +144,18 @@ FSMState update_state(Chess *chess, int instruction, FSMState state,
                 return FSMState::InvalidPiecePU;
             } else {
                 for (int i = 0; i < current_square_moves->length; i++) {
-                    if (current_square_moves->moves[i].target_square ==
-                        instruction) {
+                    /////////////////////////////////
+                    //this is for not allowing castling without the apropriate states
+                    //this is dumb but I dont care
+                    int curr = current_square_moves->moves[i].target_square;
+                    int pieceId = current_square_moves->moves[i].piece;
+                    if (pieceId == 43 && (curr == 118 || curr == 114) || pieceId == 51 && (curr == 6 || curr == 2)) {
+                        state_memory->memory[1] = instruction;
+                        state_memory->length++;
+                        return FSMState::InvalidMove;
+                    }
+                    /////////////////////////////////
+                    if (current_square_moves->moves[i].target_square == instruction) {
                         if (current_square_moves->moves[i].capture != 0) {
                             state_memory->memory[1] = instruction;
                             state_memory->length++;
