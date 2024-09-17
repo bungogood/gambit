@@ -68,7 +68,7 @@ void setup() {
 
     // Serial.println("Starting...");
     controller.init();
-    controller.calibrate();
+    // controller.calibrate();
     ble.setFSMState(FSMState::Idle);
     // upMagnet.enable();
     // indicator.init();
