@@ -50,41 +50,66 @@ std::vector<std::string> game = {
 };
 // clang-format on
 
+FSMState state;
+Move_List move_list[4];
+
 void replay() {
-    for (std::string move : game) {
+    for (std::string moveStr : game) {
+        Move move = chess.parse_move(moveStr.c_str(), move_list);
         controller.makeMove(move, 500);
         delay(1000);
     }
 }
 
-uint64_t reedSwitchValue;
-
 void setup() {
     Serial.begin(9600);
-    delay(1000);  // wait for serial monitor
-
-    // ble.begin("Gambit");
-    reedSwitchValue = 0;
-
-    // Serial.println("Starting...");
+    delay(1000);
+    Serial.println("Starting...");
     controller.init();
-    controller.calibrate();
-    ble.setFSMState(FSMState::Idle);
-    // upMagnet.enable();
-    // indicator.init();
+    // controller.calibrate();
     // Serial.println("Calibrated");
     // Move move = {SQD2, SQE3, WPAWN | WHITE, WPAWN, BPAWN | BLACK, SQE3};
     // Move move = {SQC3, SQE4, KNIGHT | WHITE, KNIGHT};
     // Move move = chess.parse_move("a2a4", WHITE);
     // controller.makeMove(move, 500);
     // board.gotoSquare(SQB4);
-    // hbot.gotoPosition({250, 0});
-    replay();
+    // replay();
+    state = FSMState::EnemyPU;
+    ble.setFSMState(state);
+    ble.setReedSwitchValue(0);
+}
+
+void enemy() {
+    if (ble.getMoveUpdated()) {
+        delay(10);  // FIX: delay stops ble crash
+        std::string moveStr = ble.readMove();
+        Move move = chess.parse_move(moveStr.c_str(), move_list);
+        chess.make_move(move);
+        state = FSMState::FriendlyPU;
+        ble.setFEN(chess.get_fen());
+        ble.setMove(move);
+        ble.setFSMState(state);
+    }
+}
+
+void friendly() {
+    Search_Info search_info;
+    chess.get_best_move(3, &search_info, move_list);
+    Move move = search_info.best_move;
+    chess.make_move(move);
+    state = FSMState::EnemyPU;
+    ble.setFEN(chess.get_fen());
+    ble.setMove(move);
+    ble.setFSMState(state);
 }
 
 void loop() {
-    ble.setReedSwitchValue(reedSwitchValue);
-    reedSwitchValue++;
-    ble.setFEN(chess.get_fen());
-    delay(1000);
+    switch (state) {
+        case FSMState::EnemyPU:
+            enemy();
+            break;
+        case FSMState::FriendlyPU:
+            friendly();
+            break;
+    }
 }

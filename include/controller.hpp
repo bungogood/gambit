@@ -6,6 +6,7 @@
 #include "board.hpp"
 #include "bridge.hpp"
 #include "chess.hpp"
+#include "fsm.hpp"
 #include "indicator.hpp"
 
 class Controller {
@@ -14,6 +15,7 @@ class Controller {
     Chess* chess;
     Indicator* indicator;
     BluetoothManager* bluetooth;
+    FSMState state;
 
    public:
     Controller(Board* board, Chess* chess, Indicator* indicator,
@@ -23,5 +25,4 @@ class Controller {
     void calibrate(int speed = CALIBRATION_SPEED);
 
     void makeMove(Move move, int speed = DEFAULT_SPEED);
-    void makeMove(std::string move, int speed = DEFAULT_SPEED);
 };

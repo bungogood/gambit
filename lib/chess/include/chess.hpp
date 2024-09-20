@@ -53,7 +53,10 @@ typedef struct {
     Move best_move;
 } Search_Info;
 
-std::string square_to_string(Square square);
+std::string square_to_string(const Square square);
+std::string move_to_string(const Move move);
+
+extern Move_List chess_move_lists[3];
 
 class Chess {
    private:
@@ -76,14 +79,17 @@ class Chess {
     uint64_t get_black();
     int get_piece_on_square(int square);
     void print_board();
-    Move parse_move(const char *move_string);
+    Move parse_move(const char *move_string, Move_List *move_list);
     int search_position(Player side, int alpha, int beta, int depth,
-                        Search_Info *search_info);
+                        Search_Info *search_info, Move_List *move_lists);
     int quiescence_search(Player side, int alpha, int beta);
     int generate_moves(Move_List *move_list, bool only_captures = false);
     inline int evaluate_position(Player side);
     void unmake_move(Move move, Square old_ep);
     void make_move(Move move);
+
+    void get_best_move(int depth, Search_Info *search_info,
+                       Move_List *move_lists);
 
     char square_char(int square);
     std::string get_fen();

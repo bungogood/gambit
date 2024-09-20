@@ -7,6 +7,7 @@
 
 #include <string>
 
+#include "chess.hpp"
 #include "fsm.hpp"
 
 #define SERVICE_UUID "f88918be-312c-4a9b-a7a2-97db83b2e3a9"
@@ -25,6 +26,12 @@ class BluetoothManager {
     void setFSMState(const FSMState state);
     void setMove(const Move move);
 
+    void writeMove(const std::string move);
+    bool getMoveUpdated() { return moveUpdated; }
+    std::string readMove();
+
+    bool connected = false;
+
    private:
     BLEServer* pServer = nullptr;
     BLEService* pService = nullptr;
@@ -32,5 +39,7 @@ class BluetoothManager {
     BLECharacteristic* reedSwitchChar = nullptr;
     BLECharacteristic* stateChar = nullptr;
     BLECharacteristic* moveChar = nullptr;
-    // bool deviceConnected = false;
+
+    std::string moveStr;
+    bool moveUpdated = false;
 };

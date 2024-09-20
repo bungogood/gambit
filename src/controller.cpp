@@ -26,12 +26,7 @@ void Controller::makeMove(Move move, int speed) {
     chess->make_move(move);
     bluetooth->setFEN(chess->get_fen());
     Serial.println(chess->get_fen().c_str());
-    // board->move(steps, speed);
+    board->move(steps, speed);
     // should do comparision between chess and matrix
     indicator->set(Color::GREEN);
-}
-
-void Controller::makeMove(std::string move, int speed) {
-    Move m = chess->parse_move(move.c_str());
-    makeMove(m, speed);
 }

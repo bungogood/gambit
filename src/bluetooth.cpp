@@ -1,15 +1,30 @@
 #include "bluetooth.hpp"
 
 class ServerCallbacks : public BLEServerCallbacks {
-    void onConnect(BLEServer* pServer) {
-        // deviceConnected = true;
-        // Serial.println("Device connected");
-    }
+    BluetoothManager* pBluetoothManager;
+
+   public:
+    ServerCallbacks(BluetoothManager* pBluetoothManager)
+        : pBluetoothManager(pBluetoothManager) {}
+
+    void onConnect(BLEServer* pServer) { pBluetoothManager->connected = true; }
 
     void onDisconnect(BLEServer* pServer) {
-        // deviceConnected = false;
-        // Serial.println("Device disconnected");
-        pServer->startAdvertising();  // Restart advertising
+        pBluetoothManager->connected = false;
+        pServer->startAdvertising();
+    }
+};
+
+class MoveCallbacks : public BLECharacteristicCallbacks {
+    BluetoothManager* pBluetoothManager;
+
+   public:
+    MoveCallbacks(BluetoothManager* pBluetoothManager)
+        : pBluetoothManager(pBluetoothManager) {}
+
+    void onWrite(BLECharacteristic* pCharacteristic) {
+        std::string value = pCharacteristic->getValue();
+        pBluetoothManager->writeMove(value);
     }
 };
 
@@ -18,7 +33,7 @@ BluetoothManager::BluetoothManager() {}
 void BluetoothManager::begin(const char* deviceName) {
     BLEDevice::init(deviceName);
     pServer = BLEDevice::createServer();
-    pServer->setCallbacks(new ServerCallbacks());
+    pServer->setCallbacks(new ServerCallbacks(this));
 
     pService = pServer->createService(SERVICE_UUID);
 
@@ -42,13 +57,9 @@ void BluetoothManager::begin(const char* deviceName) {
                             BLECharacteristic::PROPERTY_WRITE |
                             BLECharacteristic::PROPERTY_NOTIFY);
     moveChar->addDescriptor(new BLE2902());
+    moveChar->setCallbacks(new MoveCallbacks(this));
 
     pService->start();
-
-    // BLEAdvertising* pAdvertising = BLEDevice::getAdvertising();
-    // pAdvertising->addServiceUUID(SERVICE_UUID);
-    // pAdvertising->setScanResponse(false);
-    // pAdvertising->setMinPreferred(0x0);
     pServer->startAdvertising();
 }
 
@@ -80,4 +91,14 @@ void BluetoothManager::setMove(const Move move) {
                               square_to_string(move.target_square);
         moveChar->notify();
     }
+}
+
+void BluetoothManager::writeMove(const std::string move) {
+    moveStr = move;
+    moveUpdated = true;
+}
+
+std::string BluetoothManager::readMove() {
+    moveUpdated = false;
+    return moveStr;
 }

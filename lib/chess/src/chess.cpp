@@ -454,13 +454,15 @@ int Chess::quiescence_search(Player side, int alpha,
 }
 
 int Chess::search_position(Player side, int alpha, int beta, int depth,
-                           Search_Info *search_info) {
-    Move_List move_list[1];
+                           Search_Info *search_info, Move_List *move_lists) {
+    // Move_List move_list[1];
+    Move_List *move_list = &move_lists[depth - 1];
     int old_alpha = alpha;
     Square old_ep = en_passant;
     Move move;
 
-    if (!depth) return quiescence_search(side, alpha, beta);
+    // if (!depth) return quiescence_search(side, alpha, beta);
+    if (!depth) return evaluate_position(side);
     if (!generate_moves(move_list, false))
         return 10000;  // checkmate evaluation
 
@@ -476,11 +478,12 @@ int Chess::search_position(Player side, int alpha, int beta, int depth,
         }
 
         make_move(move_list->moves[i]);  // make move
-        int score =
-            -search_position(24 - side, -beta, -alpha, depth - 1, search_info);
+        int score = -search_position(24 - side, -beta, -alpha, depth - 1,
+                                     search_info, move_lists);
         unmake_move(move_list->moves[i], old_ep);  // take back
 
         search_info->best_move = move_list->moves[i];  // store best move so far
+        search_info->best_score = score;
 
         if (score >= beta) return beta;
         if (score > alpha) {
@@ -489,9 +492,17 @@ int Chess::search_position(Player side, int alpha, int beta, int depth,
         }
     }
 
-    if (alpha != old_alpha) search_info->best_move = move;  // store best move
+    if (alpha != old_alpha) {
+        search_info->best_move = move;  // store best move
+        search_info->best_score = alpha;
+    }
 
     return alpha;
+}
+
+void Chess::get_best_move(int depth, Search_Info *search_info,
+                          Move_List *move_lists) {
+    search_position(side, -10000, 10000, depth, search_info, move_lists);
 }
 
 /*********************************************************************************\
@@ -500,8 +511,7 @@ int Chess::search_position(Player side, int alpha, int beta, int depth,
 ;---------------------------------------------------------------------------------;
 \*********************************************************************************/
 
-Move Chess::parse_move(const char *move_string) {
-    Move_List move_list[1];
+Move Chess::parse_move(const char *move_string, Move_List *move_list) {
     Move move;
     generate_moves(move_list, false);
 
@@ -582,9 +592,16 @@ std::string Chess::get_fen() {
     return fen;
 }
 
-std::string square_to_string(Square square) {
+std::string square_to_string(const Square square) {
     std::string str = "";
     str += 'a' + (square & 7);
     str += '1' + 7 - (square >> 4);
+    return str;
+}
+
+std::string move_to_string(const Move move) {
+    std::string str = "";
+    str += square_to_string(move.source_square);
+    str += square_to_string(move.target_square);
     return str;
 }
