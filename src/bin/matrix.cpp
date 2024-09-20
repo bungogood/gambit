@@ -1,26 +1,25 @@
 #include <Arduino.h>
-#include "indicator.hpp"
+
 #include "bluetooth.hpp"
-
-
+#include "indicator.hpp"
 
 Indicator indicator(LED_RED, LED_GREEN, LED_BLUE);
 
 //   a  b  c  d  e  f  g   h
 // 8 .  .  .  .  .  .  .   .  8 D8
-                       
+
 // 7 .  .  .  .  .  .  .   .  7 D7
-                       
+
 // 6 .  .  .  .  .  .  .   .  6 D6
-                       
+
 // 5 .  .  .  .  .  .  .   .  5 D5
-                       
+
 // 4 .  .  .  .  .  .  .   .  4 D4
-                       
+
 // 3 .  .  .  .  .  .  .   .  3 D3
-                       
+
 // 2 .  .  .  .  .  .  .   .  2 D2
-                       
+
 // 1 .  .  .  .  .  .  .   .  1 D1 (TX1)
 //  A0  A1 A2 A3 A4 A5 D10 D11
 
@@ -29,8 +28,6 @@ const int ONE_EIGHT_PINS[8] = {D1, D2, D3, D4, D5, D6, D7, D8};
 const bool VERBOSE = false;
 int boardState[8][8];
 BluetoothManager ble;
-
-
 
 void setup() {
     Serial.begin(9600);
@@ -44,10 +41,9 @@ void setup() {
         pinMode(A_H_PINS[i], OUTPUT);
         pinMode(ONE_EIGHT_PINS[i], INPUT_PULLDOWN);
     }
-
 }
 
-void loop(){
+void loop() {
     for (int col = 0; col < 8; col++) {
         digitalWrite(A_H_PINS[col], HIGH);
         for (int row = 0; row < 8; row++) {
@@ -72,7 +68,7 @@ void loop(){
     }
 
     delay(50);
-    
+
     // Convert board state to u64
     uint64_t boardStateU64 = 0;
     for (int row = 0; row < 8; row++) {
@@ -81,6 +77,4 @@ void loop(){
         }
     }
     ble.setReedSwitchValue(boardStateU64);
-
-
 }
