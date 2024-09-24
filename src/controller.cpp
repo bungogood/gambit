@@ -2,9 +2,13 @@
 
 #include <Arduino.h>
 
-Controller::Controller(Board* board, Chess* chess, Indicator* indicator,
-                       BluetoothManager* bluetooth)
-    : board(board), chess(chess), indicator(indicator), bluetooth(bluetooth) {}
+Controller::Controller(Board* board, ReedMatrix* detection, Chess* chess,
+                       Indicator* indicator, BluetoothManager* bluetooth)
+    : board(board),
+      detection(detection),
+      chess(chess),
+      indicator(indicator),
+      bluetooth(bluetooth) {}
 
 void Controller::init() {
     board->init();

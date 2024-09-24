@@ -2,29 +2,30 @@
 
 #include <string>
 
-#include "bluetooth.hpp"
 #include "controller.hpp"
 #include "fsm.hpp"
 
 Indicator indicator(LED_RED, LED_GREEN, LED_BLUE);
 
-Magnet leftMagnet(9, {0, -30});
-Magnet rightMagnet(9, {0, 30});
-Magnet upMagnet(9, {20, 0});  // 23
-Magnet downMagnet(9, {-33, 0});
+Magnet leftMagnet(D9, {0, -30});
+Magnet rightMagnet(D9, {0, 30});
+Magnet upMagnet(D9, {20, 0});  // 23
+Magnet downMagnet(D9, {-33, 0});
 
-Motor leftMotor(2, 3, 4, 200);
-Motor rightMotor(5, 6, 7, 200);
+Motor leftMotor(D2, D3, D4, 200);
+Motor rightMotor(D5, D6, D7, 200);
 
-HBot hbot(&leftMotor, &rightMotor, 8);
+HBot hbot(&leftMotor, &rightMotor, D8);
 
 Chess chess;
 
 Board board(&hbot, &upMagnet);
 
+ReedMatrix detection(A3, A5, A4, A1, A0, A2);
+
 BluetoothManager ble;
 
-Controller controller(&board, &chess, &indicator, &ble);
+Controller controller(&board, &detection, &chess, &indicator, &ble);
 
 // clang-format off
 std::vector<std::string> game = {
