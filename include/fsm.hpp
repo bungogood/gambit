@@ -25,5 +25,3 @@ typedef struct {
 FSMState update_state(Chess *chess, int instruction, FSMState state,
                       State_Memory *state_memory, Move_List *move_list,
                       Move_List *current_square_moves);
-
-void print_bitboard(unsigned long long bitboard);

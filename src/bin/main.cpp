@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include "bluetooth.hpp"
 #include "controller.hpp"
 #include "fsm.hpp"
 
@@ -52,15 +53,20 @@ std::vector<std::string> game = {
 // clang-format on
 
 FSMState state;
-Move_List move_list[4];
 
 void replay() {
     for (std::string moveStr : game) {
-        Move move = chess.parse_move(moveStr.c_str(), move_list);
+        Move move = chess.parse_move(moveStr.c_str());
         controller.makeMove(move, 500);
         delay(1000);
     }
 }
+
+uint64_t prevBoard;
+
+State_Memory state_memory;
+Move_List cur;
+Move_List other;
 
 void setup() {
     Serial.begin(9600);
@@ -75,16 +81,20 @@ void setup() {
     // controller.makeMove(move, 500);
     // board.gotoSquare(SQB4);
     // replay();
-    state = FSMState::EnemyPU;
+
+    prevBoard = detection.read();
+    // state = FSMState::EnemyPU;
+    state = FSMState::Idle;
     ble.setFSMState(state);
-    ble.setReedSwitchValue(0);
+    ble.setReedSwitchValue(prevBoard);
 }
 
 void enemy() {
     if (ble.getMoveUpdated()) {
         delay(10);  // FIX: delay stops ble crash
         std::string moveStr = ble.readMove();
-        Move move = chess.parse_move(moveStr.c_str(), move_list);
+        Serial.println(moveStr.c_str());
+        Move move = chess.parse_move(moveStr.c_str());
         chess.make_move(move);
         state = FSMState::FriendlyPU;
         ble.setFEN(chess.get_fen());
@@ -95,7 +105,7 @@ void enemy() {
 
 void friendly() {
     Search_Info search_info;
-    chess.get_best_move(3, &search_info, move_list);
+    chess.get_best_move(3, &search_info);
     Move move = search_info.best_move;
     chess.make_move(move);
     state = FSMState::EnemyPU;
@@ -104,13 +114,59 @@ void friendly() {
     ble.setFSMState(state);
 }
 
+int countOnes(uint64_t value) {
+    return __builtin_popcountll(value);  // Works for uint64_t
+}
+
+int findLSBIndex(uint64_t value) {
+    if (value == 0) return -1;  // No bits are set, return -1
+    // ffsll returns 1-based index, so subtract 1 for 0-based index
+    return __builtin_ffsll(value) - 1;
+}
+
 void loop() {
-    switch (state) {
-        case FSMState::EnemyPU:
-            enemy();
-            break;
-        case FSMState::FriendlyPU:
-            friendly();
-            break;
+    // switch (state) {
+    //     case FSMState::EnemyPU:
+    //         enemy();
+    //         break;
+    //     case FSMState::FriendlyPU:
+    //         friendly();
+    //         break;
+    // }
+    uint64_t currentBoard = detection.read();
+    ble.setReedSwitchValue(currentBoard);
+    delay(10);
+    uint64_t diff = currentBoard ^ prevBoard;
+    if (diff && countOnes(diff) == 1) {
+        bool pickedUp = prevBoard & diff;
+        // xor and find the changed bit and its index
+        int sq8x8 = findLSBIndex(diff);
+        int square = to_square(sq8x8);
+        if (pickedUp) {
+            Serial.println("Picked up: " + String(sq8x8) +
+                           " Square: " + String(square));
+        } else {
+            Serial.println("Put down: " + String(sq8x8) +
+                           " Square: " + String(square));
+        }
+
+        chess.generate_moves(&cur);
+        state =
+            update_state(&chess, square, state, &state_memory, &cur, &other);
+
+        if (state == FSMState::MoveComplete) {
+            ble.setFEN(chess.get_fen());
+            state = FSMState::Idle;
+            state_memory.length = 0;
+        }
+
+        ble.setFSMState(state);
+        Serial.println(String(fsm_state_string(state).c_str()) + " " +
+                       String(state_memory.length));
+    } else if (state == FSMState::Error &&
+               currentBoard == chess.get_occupied()) {
+        state = FSMState::Idle;
+        ble.setFSMState(state);
     }
+    prevBoard = currentBoard;
 }

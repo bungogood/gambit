@@ -12,6 +12,7 @@ Controller::Controller(Board* board, ReedMatrix* detection, Chess* chess,
 
 void Controller::init() {
     board->init();
+    detection->init();
     indicator->init();
     indicator->set(Color::RED);
     bluetooth->begin("Gambit");

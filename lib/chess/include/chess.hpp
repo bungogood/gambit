@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>
 #include <cstdint>
+#include <string>
 typedef int Square;
 typedef int Player;
 
@@ -56,7 +56,11 @@ typedef struct {
 std::string square_to_string(const Square square);
 std::string move_to_string(const Move move);
 
-extern Move_List chess_move_lists[3];
+int to_square(int file, int rank);
+int to_square(int index);
+int to_index(int square);
+
+extern Move_List chess_move_lists[4];
 
 class Chess {
    private:
@@ -79,17 +83,19 @@ class Chess {
     uint64_t get_black();
     int get_piece_on_square(int square);
     void print_board();
-    Move parse_move(const char *move_string, Move_List *move_list);
+    Move parse_move(const char *move_string);
+    Move parse_move(Square source_square, Square target_square);
+    Move parse_move(Square source_square, Square target_square,
+                    char promoted_piece);
     int search_position(Player side, int alpha, int beta, int depth,
-                        Search_Info *search_info, Move_List *move_lists);
+                        Search_Info *search_info);
     int quiescence_search(Player side, int alpha, int beta);
     int generate_moves(Move_List *move_list, bool only_captures = false);
     inline int evaluate_position(Player side);
     void unmake_move(Move move, Square old_ep);
     void make_move(Move move);
 
-    void get_best_move(int depth, Search_Info *search_info,
-                       Move_List *move_lists);
+    void get_best_move(int depth, Search_Info *search_info);
 
     char square_char(int square);
     std::string get_fen();
