@@ -198,6 +198,8 @@ static const int move_offsets[] = {
 static const int piece_weights[] = {0, 0,   -100, 0, -300, -350, -500, -900,
                                     0, 100, 0,    0, 300,  350,  500,  900};
 
+Move_List chess_move_lists[4];
+
 Chess::Chess() : side(WHITE), en_passant(128) {
     // initialize board
 }
@@ -454,9 +456,9 @@ int Chess::quiescence_search(Player side, int alpha,
 }
 
 int Chess::search_position(Player side, int alpha, int beta, int depth,
-                           Search_Info *search_info, Move_List *move_lists) {
+                           Search_Info *search_info) {
     // Move_List move_list[1];
-    Move_List *move_list = &move_lists[depth - 1];
+    Move_List *move_list = &chess_move_lists[depth - 1];
     int old_alpha = alpha;
     Square old_ep = en_passant;
     Move move;
@@ -478,8 +480,8 @@ int Chess::search_position(Player side, int alpha, int beta, int depth,
         }
 
         make_move(move_list->moves[i]);  // make move
-        int score = -search_position(24 - side, -beta, -alpha, depth - 1,
-                                     search_info, move_lists);
+        int score =
+            -search_position(24 - side, -beta, -alpha, depth - 1, search_info);
         unmake_move(move_list->moves[i], old_ep);  // take back
 
         search_info->best_move = move_list->moves[i];  // store best move so far
@@ -500,9 +502,8 @@ int Chess::search_position(Player side, int alpha, int beta, int depth,
     return alpha;
 }
 
-void Chess::get_best_move(int depth, Search_Info *search_info,
-                          Move_List *move_lists) {
-    search_position(side, -10000, 10000, depth, search_info, move_lists);
+void Chess::get_best_move(int depth, Search_Info *search_info) {
+    search_position(side, -10000, 10000, depth, search_info);
 }
 
 /*********************************************************************************\
@@ -511,29 +512,51 @@ void Chess::get_best_move(int depth, Search_Info *search_info,
 ;---------------------------------------------------------------------------------;
 \*********************************************************************************/
 
-Move Chess::parse_move(const char *move_string, Move_List *move_list) {
+Move Chess::parse_move(Square source_square, Square target_square,
+                       char promoted_piece) {
     Move move;
+    Move_List *move_list = &chess_move_lists[0];
     generate_moves(move_list, false);
 
     for (int i = 0; i < move_list->length; i++) {
         move = move_list->moves[i];
 
-        if (move.source_square == (move_string[0] - 'a') +
-                                      (7 - (move_string[1] - '0' - 1)) * 16 &&
-            move.target_square == (move_string[2] - 'a') +
-                                      (7 - (move_string[3] - '0' - 1)) * 16) {
-            if (move.promoted_piece) {
-                if (promoted_pieces[move.promoted_piece] == move_string[4])
+        if (move.source_square == source_square &&
+            move.target_square == target_square) {
+            // Check promotion piece if provided
+            if (promoted_piece) {
+                if (move.promoted_piece &&
+                    promoted_pieces[move.promoted_piece] == promoted_piece) {
                     return move;
+                }
                 continue;
             }
 
+            // Return move if no promotion check is needed
             return move;
         }
     }
 
+    // Return an invalid move if no match is found
     move.promoted_piece = move.target_square = move.source_square = 0;
     return move;
+}
+
+Move Chess::parse_move(Square source_square, Square target_square) {
+    return parse_move(source_square, target_square, 0);
+}
+
+Move Chess::parse_move(const char *move_string) {
+    Square source_square =
+        (move_string[0] - 'a') + (7 - (move_string[1] - '0' - 1)) * 16;
+    Square target_square =
+        (move_string[2] - 'a') + (7 - (move_string[3] - '0' - 1)) * 16;
+
+    // Check if the move string includes a promotion character
+    char promoted_piece = move_string[4];
+
+    // Delegate to the overloaded parse_move function
+    return parse_move(source_square, target_square, promoted_piece);
 }
 
 void Chess::print_board() {
@@ -605,3 +628,8 @@ std::string move_to_string(const Move move) {
     str += square_to_string(move.target_square);
     return str;
 }
+
+// do the to square with the 7 - rank to get the correct square
+int to_square(int file, int rank) { return ((7 - rank) << 4) + file; }
+int to_square(int index) { return to_square(index & 7, index >> 3); }
+int to_index(int square) { return (7 - (square >> 4)) * 8 + (square & 7); }

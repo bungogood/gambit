@@ -20,7 +20,9 @@ uint64_t ReedMatrix::read() {
     uint64_t board;
     for (int row = 7; row >= 0; row--) {
         shiftOut->write(1 << row);
+        delayMicroseconds(delayInMicroseconds);
         byte data = shiftIn->read();
+        delayMicroseconds(delayInMicroseconds);
         board = board << 8 | data;
     }
     return board;

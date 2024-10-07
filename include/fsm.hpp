@@ -21,3 +21,7 @@ typedef struct {
     int memory[3];
     int length;
 } State_Memory;
+
+FSMState update_state(Chess *chess, int instruction, FSMState state,
+                      State_Memory *state_memory, Move_List *move_list,
+                      Move_List *current_square_moves);
