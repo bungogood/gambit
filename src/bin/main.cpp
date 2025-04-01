@@ -9,7 +9,7 @@ Indicator indicator(LED_RED, LED_GREEN, LED_BLUE);
 
 Magnet leftMagnet(D9, {0, -30});
 Magnet rightMagnet(D9, {0, 30});
-Magnet upMagnet(D9, {20, 0});  // 23
+Magnet upMagnet(D9, {20, 0});
 Magnet downMagnet(D9, {-33, 0});
 
 Motor leftMotor(D2, D3, D4, 200);
@@ -35,19 +35,19 @@ std::vector<std::string> game = {
     "c3e4", "b8d7",
     "e4g5", "g8f6",
     "f1d3", "e7e6",
-    // "g1f3", "h7h6",
-    // "g5e6", "d8e7",
-    // "e1g1", "f7e6",
-    // "d3g6", "e8d8",
-    // "c1f4", "b7b5",
-    // "a2a4", "c8b7",
-    // "f1e1", "f6d5",
-    // "f4g3", "d8c8",
-    // "a4b5", "c6b5",
-    // "d1d3", "b7c6",
-    // "g6f5", "e6f5",
-    // "e1e7", "f8e7",
-    // "c2c4"
+    "g1f3", "h7h6",
+    "g5e6", "d8e7",
+    "e1g1", "f7e6",
+    "d3g6", "e8d8",
+    "c1f4", "b7b5",
+    "a2a4", "c8b7",
+    "f1e1", "f6d5",
+    "f4g3", "d8c8",
+    "a4b5", "c6b5",
+    "d1d3", "b7c6",
+    "g6f5", "e6f5",
+    "e1e7", "f8e7",
+    "c2c4"
 };
 // clang-format on
 
@@ -67,17 +67,22 @@ void setup() {
     delay(1000);
     Serial.println("Starting...");
     controller.init();
-    // controller.calibrate();
-    // Serial.println("Calibrated");
+    controller.calibrate();
     // Move move = {SQD2, SQE3, WPAWN | WHITE, WPAWN, BPAWN | BLACK, SQE3};
     // Move move = {SQC3, SQE4, KNIGHT | WHITE, KNIGHT};
     // Move move = chess.parse_move("a2a4", WHITE);
     // controller.makeMove(move, 500);
-    // board.gotoSquare(SQB4);
-    // replay();
     state = FSMState::EnemyPU;
     ble.setFSMState(state);
     ble.setReedSwitchValue(0);
+
+    // board.gotoSquare(SQD4, &upMagnet, 500);
+    // upMagnet.enable();
+    // delay(100);
+    // board.gotoSquare(SQD6, &upMagnet, 600);
+    // upMagnet.disable();
+
+    replay();
 }
 
 void enemy() {
@@ -105,12 +110,48 @@ void friendly() {
 }
 
 void loop() {
-    switch (state) {
-        case FSMState::EnemyPU:
-            enemy();
-            break;
-        case FSMState::FriendlyPU:
-            friendly();
-            break;
-    }
+    // switch (state) {
+    //     case FSMState::EnemyPU:
+    //         enemy();
+    //         break;
+    //     case FSMState::FriendlyPU:
+    //         friendly();
+    //         break;
+    // }
+    // uint64_t currentBoard = detection.read();
+    // ble.setReedSwitchValue(currentBoard);
+    // delay(10);
+    // uint64_t diff = currentBoard ^ prevBoard;
+    // if (diff && countOnes(diff) == 1) {
+    //     bool pickedUp = prevBoard & diff;
+    //     // xor and find the changed bit and its index
+    //     int sq8x8 = findLSBIndex(diff);
+    //     int square = to_square(sq8x8);
+    //     if (pickedUp) {
+    //         Serial.println("Picked up: " + String(sq8x8) +
+    //                        " Square: " + String(square));
+    //     } else {
+    //         Serial.println("Put down: " + String(sq8x8) +
+    //                        " Square: " + String(square));
+    //     }
+
+    //     chess.generate_moves(&cur);
+    //     state =
+    //         update_state(&chess, square, state, &state_memory, &cur, &other);
+
+    //     if (state == FSMState::MoveComplete) {
+    //         ble.setFEN(chess.get_fen());
+    //         state = FSMState::Idle;
+    //         state_memory.length = 0;
+    //     }
+
+    //     ble.setFSMState(state);
+    //     Serial.println(String(fsm_state_string(state).c_str()) + " " +
+    //                    String(state_memory.length));
+    // } else if (state == FSMState::Error &&
+    //            currentBoard == chess.get_occupied()) {
+    //     state = FSMState::Idle;
+    //     ble.setFSMState(state);
+    // }
+    // prevBoard = currentBoard;
 }

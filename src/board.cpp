@@ -17,6 +17,13 @@ void Board::gotoSquare(Square square, int speed) {
     hbot->gotoPosition(position, speed);
 }
 
+void Board::gotoSquare(Square square, Magnet* magnet, int speed) {
+    Position position = {
+        (square % 16) * SQUARE_SIZE - OFFSET_FILE - magnet->offset.x,
+        (7 - square / 16) * SQUARE_SIZE - OFFSET_RANK - magnet->offset.y};
+    hbot->gotoPosition(position, speed);
+}
+
 void Board::move(std::vector<MoveStep> steps, int speed) {
     runSteps(steps, speed);
 }
@@ -24,9 +31,9 @@ void Board::move(std::vector<MoveStep> steps, int speed) {
 void Board::runSteps(std::vector<MoveStep> steps, int speed) {
     for (MoveStep step : steps) {
         // magnet selection
-        Position position = {(step.point.x - 2) * SQUARE_SIZE / 2 +
+        Position position = {(step.point.x - 2) * SQUARE_SIZE / 2 -
                                  OFFSET_FILE - magnet->offset.x,
-                             (step.point.y - 2) * SQUARE_SIZE / 2 +
+                             (step.point.y - 2) * SQUARE_SIZE / 2 -
                                  OFFSET_RANK - magnet->offset.y};
         if (step.magnet) {
             magnet->enable();  // magnet on

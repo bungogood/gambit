@@ -7,8 +7,8 @@
 #include "magnet.hpp"
 
 #define SQUARE_SIZE 50
-#define OFFSET_FILE 20  // A-H
-#define OFFSET_RANK 7   // 1-8
+#define OFFSET_FILE -16  // A-H
+#define OFFSET_RANK 0    // 1-8
 
 class Board {
    private:
@@ -24,4 +24,5 @@ class Board {
     void calibrate(int speed = CALIBRATION_SPEED);
     void move(std::vector<MoveStep> steps, int speed = DEFAULT_SPEED);
     void gotoSquare(Square square, int speed = DEFAULT_SPEED);
+    void gotoSquare(Square square, Magnet* magnet, int speed = DEFAULT_SPEED);
 };
